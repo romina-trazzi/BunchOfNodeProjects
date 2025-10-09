@@ -1,0 +1,53 @@
+Architettura estesa del progetto (con SASS)
+
+Obiettivo: piattaforma EventHub “quasi-enterprise” ma leggibile da un junior.
+
+
+
+Backend
+
+Node.js + Express: API REST, middleware di sicurezza, error handling centralizzato.
+
+Auth: JWT access (breve) in Authorization: Bearer, JWT refresh in cookie httpOnly (SameSite=Strict, Secure in prod).
+
+RBAC: ruoli USER | ADMIN + middleware requireRole e requireOwnershipOrAdmin.
+
+Password: bcrypt con salt rounds 12 (prod) / 10 (dev) + pepper opzionale (da .env).
+
+DB: PostgreSQL via Prisma (migrazioni, query parametrizzate, tipate).
+
+Geo: PostGIS (colonna geography(Point,4326) su Event, indice GIST, query “entro raggio”).
+
+Realtime: Socket.IO (1 istanza, niente Redis per ora). Rooms per eventId e room admin.
+
+Upload immagini: S3 con Presigned URL (upload diretto dal browser), validazione mime/size.
+
+Doc API: OpenAPI 3 con swagger-jsdoc + swagger-ui-express.
+
+Sicurezza: helmet, cors (whitelist), express-rate-limit (login e API sensibili), hpp, xss-clean, express-validator.
+
+Logging: Pino + pino-http (JSON log, redaction password/token, requestId).
+
+
+
+Frontend
+
+React + Vite.
+
+Routing: react-router-dom con ProtectedRoute.
+
+Data fetching: axios + React Query (cache, retries, loading states).
+
+Form: react-hook-form + zod (validazione UX) + Bootstrap feedback.
+
+UI: Bootstrap + FontAwesome + SASS personalizzato (variabili/mixins, tema leggero).
+
+Realtime: socket.io-client autenticato con access token.
+
+Sicurezza UI: niente HTML in chat; se mai servisse, DOMPurify.
+
+Analytics / CDC
+
+Power BI si collega in read-only a Postgres (view dedicate).
+
+(Opzionale futuro) Debezium/Kafka → DWH (non necessario per l’esercizio).
