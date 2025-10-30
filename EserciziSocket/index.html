@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini Chat</title>
+  <style>
+    body { font-family: system-ui, Arial; margin:0; display:grid; place-items:center; min-height:100vh; background:#f5f6f7; }
+    .chat { width:min(640px, 92vw); height:70vh; background:#fff; border:1px solid #e5e7eb; border-radius:12px; display:flex; flex-direction:column; }
+    header { padding:10px 12px; background:#0ea5e9; color:#fff; border-radius:12px 12px 0 0; font-weight:600; }
+    #messages { flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:8px; background:#fafafa; }
+    .m { background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:8px 10px; max-width:80%; }
+    .me { align-self:flex-end; background:#e6f7ff; border-color:#bae6fd; }
+    form { display:flex; gap:8px; padding:10px; border-top:1px solid #e5e7eb; }
+    input { flex:1; padding:10px; border:1px solid #e5e7eb; border-radius:10px; }
+    button { padding:10px 14px; border:0; border-radius:10px; background:#0ea5e9; color:#fff; font-weight:600; cursor:pointer; }
+    .sys { text-align:center; color:#64748b; font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <div class="chat">
+    <header>Mini Chat • <span id="status">Connessione…</span></header>
+    <div id="messages"></div>
+    <form id="form">
+      <input id="input" placeholder="Scrivi un messaggio…" autocomplete="off" />
+      <button>Invia</button>
+    </form>
+  </div>
+
+  <!-- Client Socket.IO servito dal tuo server -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const username = prompt("Nickname:", "utente") || "utente";
+    const socket = io(); // stesso origin
+    const statusEl = document.getElementById("status");
+    const messages = document.getElementById("messages");
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+
+    const add = (text, mine=false) => {
+      const d = document.createElement("div");
+      d.className = "m" + (mine ? " me" : "");
+      d.textContent = text;
+      messages.appendChild(d);
+      messages.scrollTop = messages.scrollHeight;
+    };
+    const sys = (t) => { const s=document.createElement("div"); s.className="sys"; s.textContent=t; messages.appendChild(s); };
+
+    socket.on("connect", () => { statusEl.textContent = "Connesso (" + socket.id + ")"; sys("✅ Connesso."); });
+    socket.on("disconnect", (r) => { statusEl.textContent = "Disconnesso"; sys("❌ Disconnesso: " + r); });
+    socket.on("messaggio", (msg) => add(msg));
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      const payload = `${username}: ${text}`;
+      socket.emit("messaggio", payload);
+      add(payload, true);
+      input.value = "";
+    });
+  </script>
+</body>
+</html>

@@ -1,22 +1,22 @@
-import { DataTypes } from "sequelize";
-import 
+module.exports = (sequelize, DataTypes) => {
+  
+  const Product = sequelize.define('Product', {
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    stock: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  }, {
+    tableName: 'products',
+    timestamps: false, 
+  });
 
-
-
-module.exports = () => (
-const Product = db.sequelize.define("Product", {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  price: {
-    type: DataTypes.INTEGER,
-    unique: true,
-    allowNull: false
-  },
-  stock : {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  }
-});
-);
+  return Product;
+};

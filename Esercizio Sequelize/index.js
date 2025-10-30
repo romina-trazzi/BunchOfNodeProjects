@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyparser = require('body-parser');
-const sequelize = require('./models');
-const Product = require('./models/product');
+const { sequelize } = require('./dbconnection');
+const router = require('./routes/routes');
 
 // Crea un'applicazione Express
 const app = express();
@@ -15,35 +15,27 @@ app.use((req, res, next) => {
   next();
 });
 
-// Rotta di base
-app.get('/', (req, res, next) => {
-  res.render('index');
-});
 
-// CRUD routes
-app.use('/products', require('./routes/routes'));
+// Connessione al database
+(async () => {
+  
+  try {
+    await sequelize.authenticate();
+    await sequelize.sync();
+    
+    console.log('DB ok');
 
-// Error handling
-app.use((error, req, res, next) => {
-  console.log(error);
-  const status = error.statusCode || 500;
-  const message = error.message;
-  res.status(status).json({ message: message });
-});
+    app.use('/', router);
 
-// Sincronizza database
-sequelize
-  .sync()
-  .then(result => {
-    console.log("Database connected");
-    app.listen(3000);
-  })
-  .catch(err => console.log(err));
-
-
-
-
-
+    app.listen(3000, () => {
+      console.log('Server running on port 3000');
+    });
+  
+  
+  } catch (err) {
+    console.error('DB error:', err);
+  }
+})();
 
 
 

@@ -1,0 +1,64 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: app_db
+    restart: unless-stopped
+    environment:
+      # Metti valori reali nel tuo .env (Compose li leggerà) oppure scrivili direttamente qui.
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-appdb}
+      MYSQL_USER: ${DB_USER:-appuser}
+      MYSQL_PASSWORD: ${DB_PASS}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: adminer:latest
+    container_name: app_adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      # host del DB sarà "db" (nome del servizio)
+      ADMINER_DEFAULT_SERVER: db
+
+  api:
+    image: node:20-alpine
+    container_name: app_api
+    working_dir: /app
+    # Monta il codice locale; node_modules rimane in un volume dedicato
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: sh -c "npm i && npm run dev"
+    env_file:
+      - .env
+    environment:
+      # Sovrascriviamo l'host DB per puntare al servizio "db" della stessa network
+      DB_HOST: db
+      DB_PORT: 3306
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
+
+
+
+# Note:
+
+# docker compose up -d    # avvia tutto in background
+# docker compose logs -f  # log live
+# docker compose down     # spegne e lascia i volumi
