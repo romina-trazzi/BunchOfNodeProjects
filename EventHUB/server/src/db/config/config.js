@@ -1,4 +1,5 @@
-require('dotenv').config(); // Load environment variables from .env file
+// Load environment variables from .env file
+require('dotenv').config(); 
 
 const common = {
   dialect: 'postgres',
