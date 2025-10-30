@@ -1,4 +1,4 @@
-require('dotenv').config(); // carica le variabili d'ambiente da .env
+require('dotenv').config(); // Load environment variables from .env file
 
 const common = {
   dialect: 'postgres',
@@ -21,9 +21,6 @@ module.exports = {
   production: {
     ...common,
     url: process.env.DATABASE_URL,
-    dialectOptions: {
-      // usa SSL se PostgreSQL è gestito da un provider esterno con SSL
-      // ssl: { require: true, rejectUnauthorized: false }
-    }
+
   }
 };
