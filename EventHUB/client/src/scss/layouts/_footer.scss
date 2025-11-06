@@ -1,0 +1,76 @@
+/* ============================================
+   Layout - Footer
+   App footer with dark theme and responsive layout
+============================================ */
+
+@use "../variables" as *;
+
+.footer {
+  background-color: $dark-color;
+  color: $light-color;
+  padding: $spacer-lg 0;
+  text-align: center;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $spacer;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacer;
+  }
+
+  .footer-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $light-color;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: $transition-base;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  .footer-links {
+    display: flex;
+    gap: $spacer;
+
+    a {
+      color: rgba($light-color, 0.85);
+      text-decoration: none;
+      font-weight: 500;
+      transition: $transition-fast;
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .footer-copy {
+    font-size: $font-size-sm;
+    margin-top: $spacer-sm;
+    opacity: 0.8;
+  }
+}
+
+/* 🔹 Responsive layout */
+@media (max-width: 768px) {
+  .footer {
+    .footer-container {
+      flex-direction: column;
+      gap: $spacer-sm;
+    }
+
+    .footer-links {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+}

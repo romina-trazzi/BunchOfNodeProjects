@@ -1,5 +1,48 @@
-// Color palette and general variables
+/* ============================================
+   Variables
+   Global style constants for EventHub frontend
+=========================================================== */
+
+/* 🎨 Color Palette */
 $primary-color: #0d6efd;
 $secondary-color: #6c757d;
-$light-bg: #f8f9fa;
-$dark-bg: #212529;
+$success-color: #198754;
+$danger-color: #dc3545;
+$warning-color: #ffc107;
+$info-color: #0dcaf0;
+$light-color: #f8f9fa;
+$dark-color: #212529;
+$body-bg: #f5f6fa;
+
+/* 🖋️ Typography */
+$font-family-base: 'Poppins', 'Segoe UI', sans-serif;
+$font-family-mono: 'Source Code Pro', monospace;
+
+/* 🔠 Font sizes */
+$font-size-base: 1rem;
+$font-size-lg: 1.25rem;
+$font-size-sm: 0.875rem;
+
+/* 📏 Spacing */
+$spacer: 1rem;
+$spacer-sm: 0.5rem;
+$spacer-lg: 2rem;
+
+/* 🧱 Border radius */
+$border-radius-sm: 0.25rem;
+$border-radius: 0.5rem;
+$border-radius-lg: 1rem;
+
+/* 🌗 Shadows */
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.2);
+
+/* 🧭 Z-index */
+$z-navbar: 1000;
+$z-modal: 1050;
+
+/* 🔤 Transitions */
+$transition-base: all 0.2s ease-in-out;
+$transition-fast: all 0.1s ease;
+$transition-slow: all 0.4s ease;

@@ -1,0 +1,78 @@
+/* ============================================
+   Layout - Navbar
+   Main navigation bar styles for EventHub
+============================================ */
+
+@use "../_variables" as *;
+
+/* 🔹 Base Navbar */
+.navbar {
+  background-color: $dark-color;
+  box-shadow: $shadow;
+  z-index: $z-navbar;
+  transition: $transition-base;
+
+  .navbar-brand {
+    color: $light-color;
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+    transition: $transition-fast;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  .navbar-toggler {
+    border-color: rgba($light-color, 0.3);
+
+    &:focus {
+      box-shadow: none;
+      outline: none;
+    }
+
+    .navbar-toggler-icon {
+      filter: invert(1);
+    }
+  }
+
+  .nav-link {
+    color: rgba($light-color, 0.9);
+    font-weight: 500;
+    padding: $spacer-sm $spacer;
+    border-radius: $border-radius-sm;
+    transition: $transition-fast;
+
+    &:hover {
+      color: $primary-color;
+      background-color: rgba($light-color, 0.05);
+    }
+
+    &.active {
+      color: $primary-color;
+      font-weight: 600;
+      background-color: rgba($light-color, 0.08);
+    }
+  }
+}
+
+/* 🔸 Optional sticky behavior */
+.navbar.sticky-top {
+  position: sticky;
+  top: 0;
+}
+
+/* 🔹 Responsive Adjustments */
+@media (max-width: 991px) {
+  .navbar-collapse {
+    background-color: $dark-color;
+    padding: $spacer;
+    border-top: 1px solid rgba($light-color, 0.1);
+  }
+
+  .nav-link {
+    display: block;
+    width: 100%;
+  }
+}

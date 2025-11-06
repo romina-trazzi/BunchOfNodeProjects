@@ -1,55 +1,315 @@
-body {
-  background-color: #f8f9fa;
-}
-
+@charset "UTF-8";
+/* ============================================
+   Variables
+   Global style constants for EventHub frontend
+=========================================================== */
+/* 🎨 Color Palette */
+/* 🖋️ Typography */
+/* 🔠 Font sizes */
+/* 📏 Spacing */
+/* 🧱 Border radius */
+/* 🌗 Shadows */
+/* 🧭 Z-index */
+/* 🔤 Transitions */
+/* ============================================
+   Layout - Navbar
+   Main navigation bar styles for EventHub
+============================================ */
+/* 🔹 Base Navbar */
 .navbar {
   background-color: #212529;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: all 0.2s ease-in-out;
 }
-
-footer {
-  background-color: #212529;
-  color: white;
-  padding: 1rem;
-  text-align: center;
+.navbar .navbar-brand {
+  color: #f8f9fa;
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: 0.5px;
+  transition: all 0.1s ease;
 }
-
-.btn-custom {
-  background-color: #0d6efd;
-  color: white;
+.navbar .navbar-brand:hover {
+  color: #0d6efd;
+}
+.navbar .navbar-toggler {
+  border-color: rgba(248, 249, 250, 0.3);
+}
+.navbar .navbar-toggler:focus {
+  box-shadow: none;
+  outline: none;
+}
+.navbar .navbar-toggler .navbar-toggler-icon {
+  filter: invert(1);
+}
+.navbar .nav-link {
+  color: rgba(248, 249, 250, 0.9);
+  font-weight: 500;
   padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: all 0.1s ease;
+}
+.navbar .nav-link:hover {
+  color: #0d6efd;
+  background-color: rgba(248, 249, 250, 0.05);
+}
+.navbar .nav-link.active {
+  color: #0d6efd;
+  font-weight: 600;
+  background-color: rgba(248, 249, 250, 0.08);
+}
+
+/* 🔸 Optional sticky behavior */
+.navbar.sticky-top {
+  position: sticky;
+  top: 0;
+}
+
+/* 🔹 Responsive Adjustments */
+@media (max-width: 991px) {
+  .navbar-collapse {
+    background-color: #212529;
+    padding: 1rem;
+    border-top: 1px solid rgba(248, 249, 250, 0.1);
+  }
+  .nav-link {
+    display: block;
+    width: 100%;
+  }
+}
+/* ============================================
+   Layout - Header / Hero Section
+   Full-screen intro section with logo and actions
+============================================ */
+/* 🔹 Hero Container */
+.header-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background: url("../../assets/img/hero-bg.jpg") center/cover no-repeat;
+  color: #f8f9fa;
+  text-align: center;
+  padding: 2rem;
+  /* Overlay for readability */
+}
+.header-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(33, 37, 41, 0.55);
+  z-index: 1;
+}
+.header-hero {
+  /* Content Layer */
+}
+.header-hero .hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+.header-hero {
+  /* Logo */
+}
+.header-hero .hero-logo {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #f8f9fa;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s ease;
+}
+.header-hero .hero-logo:hover {
+  color: #0d6efd;
+  transform: scale(1.05);
+}
+.header-hero {
+  /* Buttons */
+}
+.header-hero .hero-actions {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 600px;
+}
+.header-hero .hero-actions button {
+  padding: 0.75rem 2rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  color: #f8f9fa;
 }
-.btn-custom:hover {
-  background-color: rgb(1.762295082, 87.2336065574, 213.237704918);
-}
-
-body {
-  background: linear-gradient(135deg, #0d6efd, #6610f2);
-  color: #333;
-}
-
-.card {
-  border-radius: 1rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-.btn-primary {
+.header-hero .hero-actions button.btn-register {
   background-color: #0d6efd;
-  border: none;
 }
-.btn-primary:hover {
-  background-color: rgb(1.762295082, 87.2336065574, 213.237704918);
+.header-hero .hero-actions button.btn-register:hover {
+  background-color: rgb(1.8459016393, 91.3721311475, 223.3540983607);
+}
+.header-hero .hero-actions button.btn-logout {
+  background-color: #dc3545;
+}
+.header-hero .hero-actions button.btn-logout:hover {
+  background-color: rgb(189.2151898734, 32.7848101266, 47.7721518987);
 }
 
-body {
+/* 🔹 Responsive Adjustments */
+@media (max-width: 768px) {
+  .header-hero {
+    padding: 1rem;
+  }
+  .header-hero .hero-logo {
+    font-size: 2.2rem;
+  }
+  .header-hero .hero-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .header-hero .hero-actions button {
+    width: 80%;
+  }
+}
+/* ============================================
+   Layout - Footer
+   App footer with dark theme and responsive layout
+============================================ */
+.footer {
+  background-color: #212529;
+  color: #f8f9fa;
+  padding: 2rem 0;
+  text-align: center;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+}
+.footer .footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.footer .footer-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f8f9fa;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+.footer .footer-logo:hover {
+  color: #0d6efd;
+}
+.footer .footer-links {
+  display: flex;
+  gap: 1rem;
+}
+.footer .footer-links a {
+  color: rgba(248, 249, 250, 0.85);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.1s ease;
+}
+.footer .footer-links a:hover {
+  color: #0d6efd;
+}
+.footer .footer-copy {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  opacity: 0.8;
+}
+
+/* 🔹 Responsive layout */
+@media (max-width: 768px) {
+  .footer .footer-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .footer .footer-links {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+/* ============================================
+   Page - Login
+   User login page styles
+   ============================================ */
+.login-page {
+  background: linear-gradient(135deg, rgb(63.5819672131, 140.3073770492, 253.4180327869), #6610f2);
+  color: #f8f9fa;
+}
+.login-page .card {
+  border-radius: 1rem;
   background-color: #f8f9fa;
   color: #212529;
+}
+.login-page .card h2 {
+  font-weight: 600;
+  color: #212529;
+}
+.login-page .card .form-label {
+  font-weight: 500;
+}
+.login-page .card .btn-primary {
+  background-color: #0d6efd;
+  border: none;
+  font-weight: 600;
+  transition: all 0.1s ease;
+}
+.login-page .card .btn-primary:hover {
+  background-color: rgb(1.8459016393, 91.3721311475, 223.3540983607);
+}
+.login-page a {
+  color: #0d6efd;
+  text-decoration: none;
+}
+.login-page a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   Page - Register
+   Registration form styles
+   ============================================ */
+.register-page {
+  background: linear-gradient(135deg, #0d6efd, #212529);
+  color: #f8f9fa;
+}
+.register-page .card {
+  border-radius: 1rem;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+.register-page .card h2 {
+  font-weight: 600;
+  color: #212529;
+}
+.register-page .card .form-label {
+  font-weight: 500;
+}
+.register-page .card .btn-primary {
+  background-color: #0d6efd;
+  border: none;
+  font-weight: 600;
+  transition: all 0.1s ease;
+}
+.register-page .card .btn-primary:hover {
+  background-color: rgb(1.762295082, 87.2336065574, 213.237704918);
 }
 
 /*# sourceMappingURL=main.css.map */

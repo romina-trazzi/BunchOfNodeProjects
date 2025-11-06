@@ -1,0 +1,113 @@
+/* ============================================
+   Layout - Header / Hero Section
+   Full-screen intro section with logo and actions
+============================================ */
+
+@use "../_variables" as *;
+
+/* 🔹 Hero Container */
+.header-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background: url("../../assets/img/hero-bg.jpg") center/cover no-repeat;
+  color: $light-color;
+  text-align: center;
+  padding: $spacer-lg;
+
+  /* Overlay for readability */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba($dark-color, 0.55);
+    z-index: 1;
+  }
+
+  /* Content Layer */
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Logo */
+  .hero-logo {
+    font-size: 3rem;
+    font-weight: 700;
+    color: $light-color;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+    transition: $transition-slow;
+
+    &:hover {
+      color: $primary-color;
+      transform: scale(1.05);
+    }
+  }
+
+  /* Buttons */
+  .hero-actions {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: $spacer-lg;
+    width: 100%;
+    max-width: 600px;
+
+    button {
+      padding: 0.75rem 2rem;
+      font-size: $font-size-lg;
+      font-weight: 600;
+      border-radius: $border-radius;
+      border: none;
+      cursor: pointer;
+      transition: $transition-base;
+      color: $light-color;
+
+      &.btn-register {
+        background-color: $primary-color;
+
+        &:hover {
+          background-color: darken($primary-color, 8%);
+        }
+      }
+
+      &.btn-logout {
+        background-color: $danger-color;
+
+        &:hover {
+          background-color: darken($danger-color, 10%);
+        }
+      }
+    }
+  }
+}
+
+/* 🔹 Responsive Adjustments */
+@media (max-width: 768px) {
+  .header-hero {
+    padding: $spacer;
+    .hero-logo {
+      font-size: 2.2rem;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      gap: $spacer;
+      button {
+        width: 80%;
+      }
+    }
+  }
+}

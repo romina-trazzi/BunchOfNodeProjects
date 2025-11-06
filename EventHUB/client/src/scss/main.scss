@@ -1,11 +1,6 @@
 // Bootstrap base (optional: can be customized)
-@use "variables";
-@use "layouts";
-@use "components";
-@use "pages";
+@use "_variables";
+@use "layouts/layouts";
+@use "pages/pages";
 
-body {
-  background-color: variables.$light-bg;
-  color: variables.$dark-bg;
-}
 
