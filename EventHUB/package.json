@@ -2,17 +2,15 @@
   "name": "eventhub",
   "version": "1.0.0",
   "main": "index.js",
-
-  "scripts": {
-    "dev:server": "NODE_ENV=development nodemon server/src/server.js | pino-pretty",
-    "dev:sass": "sass --load-path=node_modules client/src/scss/main.scss client/public/assets/css/main.css --watch",
-    "dev:client": "lite-server --config=client/bs-config.json",
-    "dev": "concurrently -n SASS,WEB,API -c cyan,magenta,blue \"npm run dev:sass\" \"npm run dev:client\" \"npm run dev:server\"",
-
-    "db:migrate": "sequelize-cli db:migrate",
-    "db:migrate:undo": "sequelize-cli db:migrate:undo",
-    "db:seed": "sequelize-cli db:seed:all",
-    "db:seed:undo": "sequelize-cli db:seed:undo:all"
+ "scripts": {
+  "dev:server": "cross-env NODE_ENV=development nodemon server/src/server.js | pino-pretty",
+  "dev:sass": "sass --load-path=node_modules client/src/scss/main.scss client/assets/css/main.css --watch",
+  "dev:client": "lite-server --config=client/bs-config.json",
+  "dev": "concurrently -n SASS,WEB,API -c cyan,magenta,blue \"npm run dev:sass\" \"npm run dev:client\" \"npm run dev:server\"",
+  "db:migrate": "sequelize-cli db:migrate",
+  "db:migrate:undo": "sequelize-cli db:migrate:undo",
+  "db:seed": "sequelize-cli db:seed:all",
+  "db:seed:undo": "sequelize-cli db:seed:undo:all"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,8 @@
+{
+  "port": 3000,
+  "files": ["./client/public/**/*.{html,htm,css,js}"],
+  "server": {
+    "baseDir": "client/public"
+  },
+  "proxy": "http://localhost:4000"
+}
