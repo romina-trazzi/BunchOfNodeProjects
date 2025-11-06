@@ -1,0 +1,28 @@
+// Page-specific styles
+@use "variables" as v;
+
+
+// Login page
+body {
+  background: linear-gradient(135deg, #0d6efd, #6610f2);
+  color: #333;
+}
+
+.card {
+  border-radius: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border: none;
+
+  &:hover {
+    background-color: darken(#0d6efd, 10%);
+  }
+}

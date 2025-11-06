@@ -1,5 +1,11 @@
-/* main.scss — placeholder for styles */
+// Bootstrap base (optional: can be customized)
+@use "variables";
+@use "layouts";
+@use "components";
+@use "pages";
+
 body {
-  background: #f5f5f5;
-  font-family: sans-serif;
+  background-color: variables.$light-bg;
+  color: variables.$dark-bg;
 }
+
