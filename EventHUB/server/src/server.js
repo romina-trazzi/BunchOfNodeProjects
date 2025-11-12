@@ -16,10 +16,13 @@ const helmet = require('helmet');
 const cors = require('cors');
 
 // Import the Sequelize connection and retry helper
-const { sequelize, connectWithRetry } = require('./db/config/db_connection');
+const { sequelize, connectWithRetry } = require('./config/db_connection');
 
 // Import initialized models (this automatically loads User, Event, etc.)
-const db = require('./db/models');
+const db = require('./models');
+
+// Import routes
+const authRoutes = require("./routes/authRoutes"); 
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
@@ -60,6 +63,12 @@ app.get('/health', async (_req, res) => {
   }
 });
 
+
+/* ---------------------------
+ * API routes
+ * --------------------------- */
+app.use('/api/auth', authRoutes);
+
 /* ---------------------------
  * Server start sequence
  * ---------------------------
@@ -88,3 +97,6 @@ app.get('/health', async (_req, res) => {
 
 // Export app for testing (optional)
 module.exports = app;
+
+
+

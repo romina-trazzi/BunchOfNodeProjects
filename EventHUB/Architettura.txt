@@ -32,15 +32,13 @@ Logging: Pino + pino-http (JSON log, redaction password/token, requestId).
 
 Frontend
 
-React + Vite.
+Bootstrap + Sass
 
-Routing: react-router-dom con ProtectedRoute.
+Routing: 
 
-Data fetching: axios + React Query (cache, retries, loading states).
+Data fetching: axios 
 
-Form: react-hook-form + zod (validazione UX) + Bootstrap feedback.
-
-UI: Bootstrap + FontAwesome + SASS personalizzato (variabili/mixins, tema leggero).
+Form validation: Bootstrap feedback.
 
 Realtime: socket.io-client autenticato con access token.
 

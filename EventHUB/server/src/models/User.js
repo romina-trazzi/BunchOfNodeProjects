@@ -1,37 +1,37 @@
-'use strict';
-
 module.exports = (sequelize, DataTypes) => {
-    
   const User = sequelize.define('User', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+    },
+    username: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: true,
     },
     email: {
       type: DataTypes.STRING(180),
       allowNull: false,
-      unique: true
+      unique: true,
+      validate: { isEmail: true },
     },
     passwordHash: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
     },
     role: {
       type: DataTypes.ENUM('USER', 'ADMIN'),
       allowNull: false,
-      defaultValue: 'USER'
-    }
+      defaultValue: 'USER',
+    },
   });
 
   // Associations between User and other models
   User.associate = (models) => {
-    // One User -> Many Events 
     User.hasMany(models.Event, { foreignKey: 'ownerId' });
-    // One User -> Many Registrations
     User.hasMany(models.Registration, { foreignKey: 'userId' });
-    // One User -> Many Messages 
     User.hasMany(models.Message, { foreignKey: 'userId' });
   };
 
