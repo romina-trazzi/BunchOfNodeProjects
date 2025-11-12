@@ -1,0 +1,175 @@
+<!-- client/pages/dashboard.html -->
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EventHub Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+     
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css" />
+
+  </head>
+
+  <body class="dashboard-page">
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">EventHub</a>
+
+        <!-- Toggle hamburger -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+          aria-controls="navbarContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Content -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+          <ul class="navbar-nav align-items-center">
+
+            <!-- 👤 User Dropdown -->
+            <li class="nav-item dropdown me-3">
+              <button
+                class="btn btn-link nav-link dropdown-toggle text-light d-flex align-items-center"
+                id="userDropdown"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="bi bi-person-circle me-1"></i>
+                <span id="usernameDisplay">Utente</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
+                <li>
+                  <button class="dropdown-item" type="button">
+                    Profilo (coming soon)
+                  </button>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <button id="logoutBtn" class="dropdown-item text-danger fw-semibold" type="button">
+                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                  </button>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 🔔 Notifications -->
+            <li class="nav-item position-relative me-3">
+              <a class="nav-link" href="#">
+                <i class="bi bi-bell-fill"></i>
+                <span
+                  id="notifBadge"
+                  class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle"
+                >3</span>
+              </a>
+            </li>
+
+            <!-- 🔴 Logout (mobile only) -->
+            <li class="nav-item d-lg-none">
+              <button
+                id="logoutBtnMobile"
+                class="btn btn-danger btn-sm w-100 mt-2 fw-semibold"
+                type="button"
+              >
+                <i class="bi bi-box-arrow-right me-1"></i> Logout
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+        
+    
+      
+
+    <!-- HERO / INTRO -->
+    <header class="dashboard-hero py-5 text-center text-light fade-in">
+      <h2 class="fw-bold">Ciao, <span id="welcomeUser">Utente</span> 👋</h2>
+      <p class="lead">Gestisci i tuoi eventi e partecipa alla community EventHub</p>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-container container py-5 fade-in">
+      <div class="row g-4">
+
+        <!-- Card: Crea evento -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 dashboard-card shadow">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">Crea nuovo evento</h5>
+              <p class="card-text">Imposta titolo, data, luogo e immagine.</p>
+              <button class="btn btn-success w-75">Crea</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+        <!-- Card: Eventi creati -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 dashboard-card shadow">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">I miei eventi</h5>
+              <p class="card-text">Visualizza e gestisci gli eventi che hai creato.</p>
+              <button class="btn btn-primary w-75">Gestisci</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Eventi iscritti -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 dashboard-card shadow">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">Eventi a cui partecipo</h5>
+              <p class="card-text">
+                Scopri a quali eventi sei iscritto e chatta con i partecipanti.
+              </p>
+              <button class="btn btn-outline-primary w-75">Vai</button>
+            </div>
+          </div>
+        </div>
+
+   
+
+      <!-- Admin Section -->
+      <section id="adminSection" class="mt-5 d-none fade-in">
+        <h4 class="text-center text-warning mb-3">👑 Area Amministratore</h4>
+        <div class="card bg-dark text-light shadow-lg">
+          <div class="card-body text-center">
+            <p class="mb-0">Gestisci eventi segnalati e approva nuove creazioni.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer mt-5">
+      <div class="footer-container">
+        <a href="#" class="footer-logo">EventHub</a>
+        <div class="footer-links">
+          <a href="#">Chi siamo</a>
+          <a href="#">Contatti</a>
+          <a href="#">Privacy</a>
+        </div>
+        <p class="footer-copy">© 2025 EventHub. Tutti i diritti riservati.</p>
+      </div>
+    </footer>
+
+    <script src="../js/dashboard.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.js"></script>
+
+  </body>
+</html>

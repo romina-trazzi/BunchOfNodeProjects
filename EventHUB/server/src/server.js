@@ -30,9 +30,46 @@ const PORT = Number(process.env.PORT) || 4000;
 /* ---------------------------
  * Security & body parsing
  * --------------------------- */
-app.use(helmet());               // Adds security-related HTTP headers
-app.use(cors({ origin: true })); // For now allow all origins; can restrict later
-app.use(express.json());         // Parses incoming JSON payloads
+
+/* ---------------------------
+ * Security & body parsing
+ * --------------------------- */
+
+
+  // Configure Helmet with custom CSP (Content Security Policy)
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          "default-src": ["'self'"],
+          "script-src": [
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "https://cdnjs.cloudflare.com"
+          ],
+          "style-src": [
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "https://cdn.jsdelivr.net",
+            "https://fonts.googleapis.com"
+          ],
+          "font-src": [
+            "'self'",
+            "https://fonts.gstatic.com",
+            "https://cdn.jsdelivr.net"
+          ],
+          "img-src": ["'self'", "data:", "https://cdn.jsdelivr.net"],
+        },
+      },
+      crossOriginEmbedderPolicy: false, // evita problemi con risorse esterne (es. Bootstrap)
+    })
+  );
+
+
+
+
+app.use(express.json());
 
 /* ---------------------------
  * Static frontend
