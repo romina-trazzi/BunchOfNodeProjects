@@ -318,12 +318,14 @@
     border-top: 1px solid rgba(248, 249, 250, 0.1);
   }
 
-  .nav-item {
-    width: 100%;
-  }
-
-  #logoutBtnMobile {
-    display: block;
+  /* Le voci di menu a tutta larghezza solo su mobile */
+  @media (max-width: 991px) {
+    .nav-item {
+      width: 100%;
+    }
+    #logoutBtnMobile {
+      display: block;
+    }
   }
   
   
@@ -401,11 +403,18 @@
   transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
 }
 
-.show > .dropdown-menu {
+/* Mostra il menu quando Bootstrap applica .show al menu o al contenitore */
+.dropdown-menu.show,
+.dropdown.show > .dropdown-menu {
   opacity: 1;
   transform: translateY(0);
   visibility: visible;
 }
+
+#createEventSection {
+  animation: fadeIn 0.6s ease forwards;
+}
+
 
 
 /* ============================================

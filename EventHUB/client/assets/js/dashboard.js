@@ -28,6 +28,55 @@ document.addEventListener("DOMContentLoaded", () => {
     notifBadge.classList.add("pulse");
   }, 2000);
 
+
+  // ========== Gestione form "Crea Evento" ==========
+  document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ Dashboard JS attivo");
+
+  const openBtn = document.getElementById("openCreateEventBtn");
+  const createSection = document.getElementById("createEventSection");
+  const cancelBtn = document.getElementById("cancelEventBtn");
+  const createForm = document.getElementById("createEventForm");
+
+  if (!openBtn) {
+    console.warn("⚠️ Bottone 'Crea evento' non trovato nel DOM");
+    return;
+  }
+
+  // Mostra il form
+  openBtn.addEventListener("click", () => {
+    console.log("🟢 Click su 'Crea evento'");
+    createSection.classList.remove("d-none");
+    createSection.scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Nascondi il form su annulla
+  cancelBtn?.addEventListener("click", () => {
+    console.log("🔴 Form annullato");
+    createForm.reset();
+    createSection.classList.add("d-none");
+  });
+
+  // Gestione submit (per ora simulata)
+  createForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const newEvent = {
+      title: document.getElementById("eventTitle").value.trim(),
+      description: document.getElementById("eventDescription").value.trim(),
+      date: document.getElementById("eventDate").value,
+      location: document.getElementById("eventLocation").value.trim(),
+      capacity: parseInt(document.getElementById("eventCapacity").value),
+      image: document.getElementById("eventImage").files[0]?.name || null,
+    };
+
+    console.log("📦 Evento creato:", newEvent);
+    alert("Evento creato (simulazione)");
+    createForm.reset();
+    createSection.classList.add("d-none");
+  });
+});
+
   // Logout logic shared by both buttons
   const logout = () => {
     const body = document.querySelector("body");
