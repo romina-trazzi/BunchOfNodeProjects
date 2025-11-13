@@ -23,13 +23,13 @@ const db = require('./models');
 
 // Import routes
 const authRoutes = require("./routes/authRoutes"); 
+const eventRoutes = require("./routes/eventRoutes");
+
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
 
-/* ---------------------------
- * Security & body parsing
- * --------------------------- */
+
 
 /* ---------------------------
  * Security & body parsing
@@ -105,6 +105,7 @@ app.get('/health', async (_req, res) => {
  * API routes
  * --------------------------- */
 app.use('/api/auth', authRoutes);
+app.use('/api/events', require('./routes/eventRoutes'));
 
 /* ---------------------------
  * Server start sequence

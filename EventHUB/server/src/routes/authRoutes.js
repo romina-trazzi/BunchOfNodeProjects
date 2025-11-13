@@ -2,8 +2,11 @@
 const express = require("express");
 const router = express.Router();
 const { body } = require("express-validator");
-const { register, login, refreshToken } = require("../controllers/authControllers");
-const { authenticateToken } = require("../middlewares/authMiddleware");
+const { register, login, refreshToken } = require("../controllers/authController");
+const authenticateToken = require("../middlewares/authMiddleware");
+
+console.log("DEBUG authMiddleware IMPORT =", authenticateToken);
+console.log("TYPE =", typeof authenticateToken);
 
 // Route to register a new user
 router.post(

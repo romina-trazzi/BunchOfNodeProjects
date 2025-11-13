@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = (sequelize, DataTypes) => {
   const Event = sequelize.define('Event', {
     id: {
@@ -46,8 +44,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(500),
       allowNull: true
     },
-    location: {
+    location_geo: {
       type: DataTypes.GEOGRAPHY('POINT', 4326),
+      allowNull: true
+    },
+    location: { 
+      type: DataTypes.STRING(500),
       allowNull: true
     }
   });
