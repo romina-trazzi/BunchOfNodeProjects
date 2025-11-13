@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const openBtn = document.getElementById("openCreateEventBtn");
   const createSection = document.getElementById("createEventSection");
+  const cardsRow = document.querySelector(".dashboard-container .row");
   const cancelBtn = document.getElementById("cancelEventBtn");
   const createForm = document.getElementById("createEventForm");
 
@@ -41,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Mostra il form
     openBtn.addEventListener("click", () => {
       console.log("Click su 'Crea evento'");
+      if (cardsRow) cardsRow.classList.add("creating");
       createSection.classList.remove("d-none");
       createSection.scrollIntoView({ behavior: "smooth" });
     });
@@ -52,10 +54,11 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Form annullato");
       createForm.reset();
       createSection.classList.add("d-none");
+      if (cardsRow) cardsRow.classList.remove("creating");
     });
   }
 
-  // Gestione submit (per ora simulata)
+  // Gestione submit 
   if (createForm) {
     createForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -73,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Evento creato (simulazione)");
       createForm.reset();
       createSection.classList.add("d-none");
+      if (cardsRow) cardsRow.classList.remove("creating");
     });
   }
 
