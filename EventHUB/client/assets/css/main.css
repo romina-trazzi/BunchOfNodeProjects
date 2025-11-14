@@ -556,3 +556,17 @@
     display: none;
   }
 }
+
+/* ============================================
+   CARD EVENTI CREATI DALL'UTENTE
+============================================ */
+
+.card-description {
+  max-height: 3.5rem;         
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;          /* numero di righe */
+  -webkit-box-orient: vertical;
+}

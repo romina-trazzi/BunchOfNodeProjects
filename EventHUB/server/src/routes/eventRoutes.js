@@ -1,13 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const { createEvent } = require('../controllers/eventController');
-const authMiddleware = require("../middlewares/authMiddleware");
+const { createEvent, getMyEvents } = require("../controllers/eventController");
+const authenticateToken = require("../middlewares/authMiddleware");
 
-console.log("DEBUG> createEvent =", createEvent);
-console.log("DEBUG> authMiddleware =", authMiddleware);
+// POST
+router.post("/", authenticateToken, createEvent);
 
-// POST /api/events
-router.post('/', authMiddleware, createEvent);
+// GET
+router.get("/mine_events", authenticateToken, getMyEvents);
 
 module.exports = router;

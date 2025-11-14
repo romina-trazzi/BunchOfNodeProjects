@@ -97,11 +97,14 @@
       <p class="lead">Gestisci i tuoi eventi e partecipa alla community EventHub</p>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main class="dashboard-container container py-5 fade-in">
-      <div class="row g-4">
 
-        <!-- Card: Crea evento -->
+      <!-- ===================================================== -->
+      <!-- ROW CON LE 3 CARD PRINCIPALI                          -->
+      <!-- ===================================================== -->
+      <div id="mainCardsRow" class="row g-4">
+
+        <!-- CARD 1: CREA EVENTO -->
         <div class="col-md-6 col-lg-4 d-flex">
           <div class="card dashboard-card shadow h-100 flex-fill">
             <div class="card-body text-center">
@@ -112,33 +115,26 @@
           </div>
         </div>
 
-        <!-- Sezione creazione evento -->
+        <!-- SEZIONE CREAZIONE EVENTO -->
         <section id="createEventSection" class="fade-in d-none mt-4">
-          
           <div class="card shadow-lg border-0">
-            
             <div class="card-body">
               <h5 class="fw-bold mb-3 text-center">Crea un nuovo evento 🎉</h5>
 
-              <!-- Form di creazione evento -->
               <form id="createEventForm" enctype="multipart/form-data">
-                
                 <div class="row g-3">
 
-                  <!-- Titolo -->
                   <div class="col-md-6">
                     <label class="form-label fw-semibold">Titolo</label>
                     <input type="text" class="form-control" id="eventTitle" required />
                   </div>
 
-                  <!-- Luogo -->
                   <div class="col-md-6">
                     <label class="form-label fw-semibold">Luogo</label>
                     <input type="text" class="form-control" id="eventLocation" required />
                   </div>
 
-                  <!-- Categoria -->
-                  <div class="mb-3">
+                  <div class="col-12">
                     <label for="eventCategory" class="form-label">Categoria</label>
                     <select id="eventCategory" class="form-select">
                       <option value="">Seleziona una categoria</option>
@@ -151,57 +147,50 @@
                     </select>
                   </div>
 
-                  <!-- Descrizione -->
                   <div class="col-12">
                     <label class="form-label fw-semibold">Descrizione</label>
                     <textarea class="form-control" id="eventDescription" rows="3" required></textarea>
                   </div>
 
-                  <!-- Data -->
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Data</label>
                     <input type="date" class="form-control" id="eventDate" required />
                   </div>
 
-                  <!-- Capienza -->
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Capienza</label>
                     <input type="number" class="form-control" id="eventCapacity" min="1" required />
                   </div>
 
-                  <!-- Immagine -->
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Immagine (facoltativa)</label>
                     <input type="file" class="form-control" id="eventImage" accept="image/*" />
                   </div>
+
                 </div>
 
-                <!-- Buttons -->
                 <div class="text-center mt-4">
                   <button type="submit" class="btn btn-success w-75">Crea</button>
                   <button type="button" id="cancelEventBtn" class="btn btn-outline-secondary px-4">Annulla</button>
                 </div>
-                 <!-- / Buttons -->
 
               </form>
-               <!-- /Form -->
             </div>
-
           </div>
         </section>
-    
-        <!-- Card: Eventi creati -->
+
+        <!-- CARD 2: I MIEI EVENTI -->
         <div class="col-md-6 col-lg-4 d-flex">
           <div class="card dashboard-card shadow h-100 flex-fill">
             <div class="card-body text-center">
-              <h5 class="card-title fw-bold">I miei eventi</h5>
+              <h5 class="card-title fw-bold">I miei eventi creati</h5>
               <p class="card-text">Visualizza e gestisci gli eventi che hai creato.</p>
-              <button class="btn btn-primary w-75">Gestisci</button>
+              <button id="showMyEventsBtn" class="btn btn-primary w-75">Gestisci</button>
             </div>
           </div>
         </div>
 
-        <!-- Card: Eventi iscritti -->
+        <!-- CARD 3: EVENTI A CUI PARTECIPO -->
         <div class="col-md-6 col-lg-4 d-flex">
           <div class="card dashboard-card shadow h-100 flex-fill">
             <div class="card-body text-center">
@@ -214,16 +203,32 @@
           </div>
         </div>
 
-        <!-- Admin  -->
-        <section id="adminSection" class="mt-5 d-none fade-in">
-          <h4 class="text-center text-warning mb-3">👑 Area Amministratore</h4>
-          <div class="card bg-dark text-light shadow-lg">
-            <div class="card-body text-center">
-              <p class="mb-0">Gestisci eventi segnalati e approva nuove creazioni.</p>
-            </div>
-          </div>
-        </section>
+      </div> 
+      <!-- / mainCardsRow -->
+
+
+
+      <!-- ===================================================== -->
+      <!-- SEZIONE: LISTA EVENTI CREATI (NASCOSTA)               -->
+      <!-- ===================================================== -->
+
+      <section id="myEventsSection" class="d-none fade-in mt-5">
+
+        <h4 class="fw-bold text-center mb-4">I miei eventi</h4>
+
+        <div id="myEventsContainer" class="row g-4"></div>
+
+        <div class="text-center mt-4">
+          <button id="closeMyEventsBtn" class="btn btn-outline-secondary px-4">
+            Chiudi
+          </button>
+        </div>
+
+      </section>
+
     </main>
+
+
 
     <!-- FOOTER -->
     <footer class="footer">

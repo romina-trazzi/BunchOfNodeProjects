@@ -14,7 +14,7 @@ export async function tokenFetch(url, options = {}) {
   if (response.status === 401 || response.status === 403) {
     localStorage.clear();
     alert("Sessione scaduta. Effettua di nuovo il login.");
-    window.location.href = "/assets/pages/login.html";
+    window.location.href = "../../index.html";
     return;
   }
 
