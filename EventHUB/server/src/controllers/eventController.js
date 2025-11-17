@@ -1,6 +1,7 @@
 const db = require("../models");
 const Event = db.Event;
 const Registration = db.Registration;
+const User = db.User;
 const { Op } = db.Sequelize;
 
 // ============================================================
@@ -149,24 +150,19 @@ exports.getAllEvents = async (req, res) => {
   try {
     const { title, month, category, location } = req.query;
 
-    const where = {};
+    const baseOr = { [Op.or]: [ { status: "APPROVED" }, { ownerId: req.user.id } ] };
+    const andConditions = [ baseOr ];
 
-    where.status = "APPROVED";
-
-    if (title) where.title = { [Op.iLike]: `%${title}%` };
-
-    if (month) {
-      where.startsAt = db.Sequelize.where(
-        db.Sequelize.fn("to_char", db.Sequelize.col("startsAt"), "MM"),
-        month
-      );
-    }
-
-    if (category) where.category = category;
-    if (location) where.location = { [Op.iLike]: `%${location}%` };
+    if (title) andConditions.push({ title: { [Op.iLike]: `%${title}%` } });
+    if (category) andConditions.push({ category });
+    if (location) andConditions.push({ location: { [Op.iLike]: `%${location}%` } });
+    if (month) andConditions.push(db.Sequelize.where(
+      db.Sequelize.fn("to_char", db.Sequelize.col("startsAt"), "MM"),
+      month
+    ));
 
     const events = await Event.findAll({
-      where,
+      where: { [Op.and]: andConditions },
       order: [["startsAt", "ASC"]],
     });
 
@@ -304,6 +300,13 @@ exports.getPendingEvents = async (req, res) => {
   try {
     const events = await Event.findAll({
       where: { status: "PENDING" },
+      include: [
+        {
+          model: User,
+          as: "User",              
+          attributes: ["username", "email"]
+        }
+      ],
       order: [["createdAt", "ASC"]]
     });
 
@@ -311,6 +314,6 @@ exports.getPendingEvents = async (req, res) => {
 
   } catch (err) {
     console.error("Errore getPendingEvents:", err);
-    res.status(500).json({ error: "Errore nel recupero degli eventi in attesa" });
+    res.status(500).json({ error: "Errore nel recupero degli eventi" });
   }
 };

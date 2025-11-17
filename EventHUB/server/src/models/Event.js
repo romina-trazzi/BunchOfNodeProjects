@@ -57,7 +57,10 @@ module.exports = (sequelize, DataTypes) => {
   // Associations between Event and other models
   Event.associate = (models) => {
     // One Event -> One User (owner)
-    Event.belongsTo(models.User, { foreignKey: 'ownerId' });
+    Event.belongsTo(models.User, {
+      foreignKey: 'ownerId',
+      as: 'User'
+    });
     // One Event -> Many Registrations
     Event.hasMany(models.Registration, { foreignKey: 'eventId' });
     // One Event -> Many Messages

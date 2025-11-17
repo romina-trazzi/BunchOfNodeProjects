@@ -448,6 +448,22 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "./catalogue.html";
   });
 
+  // REDIRECT alla pagina eventi pending (solo admin)
+  const btnPending = document.getElementById("btnPendingEvents");
+
+  if (btnPending) {
+    btnPending.addEventListener("click", () => {
+      window.location.href = "./admin_pending_events.html";
+    });
+  }
+
+  const btnUserManagement = document.getElementById("btnUserManagement");
+  if (btnUserManagement) {
+    btnUserManagement.addEventListener("click", () => {
+      window.location.href = "./admin_user_management.html";
+    });
+  }
+
 
 
 

@@ -37,6 +37,7 @@ form.addEventListener("submit", async (e) => {
       // ✅ Save tokens locally
       localStorage.setItem("accessToken", data.tokens.accessToken);
       localStorage.setItem("refreshToken", data.tokens.refreshToken);
+      if (data.user?.id) localStorage.setItem("userId", data.user.id);
       localStorage.setItem("username", data.user.username);
       localStorage.setItem("userRole", data.user.role);
       localStorage.setItem("userId", data.user.id);
