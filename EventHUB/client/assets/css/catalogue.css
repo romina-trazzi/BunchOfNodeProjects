@@ -1,0 +1,119 @@
+/* ============================================================
+   CATALOGO EVENTI • CSS
+   Coerente con dashboard, ottimizzato per UX e leggibilità
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   CARD EVENTO
+   ------------------------------------------------------------ */
+
+.event-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid #eaeaea;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0.75rem 1.25rem rgba(0, 0, 0, 0.15);
+}
+
+.event-card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 1rem;
+}
+
+/* Descrizione: max 3 righe */
+.card-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 1rem;
+}
+
+/* Bottoni sempre in fondo */
+.event-card-buttons {
+  margin-top: auto;
+}
+
+
+/* ------------------------------------------------------------
+   BADGE
+   ------------------------------------------------------------ */
+
+.badge-organizer {
+  background-color: #0d6efd !important;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.badge-subscribed {
+  background-color: #198754 !important;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+}
+
+
+/* ------------------------------------------------------------
+   FILTRI
+   ------------------------------------------------------------ */
+
+.card .form-control,
+.card .form-select {
+  border-radius: 0.45rem;
+}
+
+/* Margine verticale piccolo solo su mobile */
+@media (max-width: 768px) {
+  .card .form-control,
+  .card .form-select {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* ------------------------------------------------------------
+   LOADING PLACEHOLDER
+   ------------------------------------------------------------ */
+
+.catalogue-loading {
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.catalogue-loading p {
+  margin-top: 1rem;
+  color: #6c757d;
+}
+
+
+/* ------------------------------------------------------------
+   NO EVENTS MESSAGE
+   ------------------------------------------------------------ */
+
+.no-events {
+  text-align: center;
+  padding: 3rem 0;
+  color: #6c757d;
+}
+
+
+/* ------------------------------------------------------------
+   ANIMAZIONI PICCOLE DI INGRESSO
+   ------------------------------------------------------------ */
+
+.fade-in {
+  animation: fadeIn 0.35s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}

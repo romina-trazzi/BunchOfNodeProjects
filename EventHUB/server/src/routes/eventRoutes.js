@@ -4,16 +4,18 @@ const router = express.Router();
 const eventController = require("../controllers/eventController");
 const authenticateToken = require("../middlewares/authMiddleware");
 
-// POST crea evento
+// CRUD
 router.post("/", authenticateToken, eventController.createEvent);
-
-// GET eventi dell’utente
 router.get("/mine_events", authenticateToken, eventController.getMyEvents);
-
-// DELETE elimina evento
+router.put("/:id", authenticateToken, eventController.updateEvent);
 router.delete("/:id", authenticateToken, eventController.deleteEvent);
 
-// PUT aggiorna un evento
-router.put("/:id", authenticateToken, eventController.updateEvent);
+// Catalogo
+router.get("/", authenticateToken, eventController.getAllEvents);
+
+// Iscrizioni
+router.get("/subscribed", authenticateToken, eventController.getSubscribedEvents);
+router.post("/:id/subscribe", authenticateToken, eventController.subscribeToEvent);
+router.delete("/:id/unsubscribe", authenticateToken, eventController.unsubscribeFromEvent);
 
 module.exports = router;

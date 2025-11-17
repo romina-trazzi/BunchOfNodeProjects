@@ -100,11 +100,24 @@
     <main class="dashboard-container container py-5 fade-in">
 
       <!-- ===================================================== -->
-      <!-- ROW CON LE 3 CARD PRINCIPALI                          -->
+      <!-- ROW CON LE CARD PRINCIPALI                          -->
       <!-- ===================================================== -->
       <div id="mainCardsRow" class="row g-4">
 
-        <!-- CARD 1: CREA EVENTO -->
+        <!-- CARD 1: CATALOGO EVENTI -->
+        <div class="col-md-6 col-lg-4 d-flex">
+          <div class="card dashboard-card shadow h-100 flex-fill">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">Catalogo eventi</h5>
+              <p class="card-text">
+                Esplora tutti gli eventi pubblici della piattaforma.
+              </p>
+              <button id="openCatalogueBtn" class="btn btn-info w-75">Apri catalogo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: CREA EVENTO -->
         <div class="col-md-6 col-lg-4 d-flex">
           <div class="card dashboard-card shadow h-100 flex-fill">
             <div class="card-body text-center">
@@ -179,7 +192,7 @@
           </div>
         </section>
 
-        <!-- CARD 2: I MIEI EVENTI -->
+        <!-- CARD 3: I MIEI EVENTI -->
         <div class="col-md-6 col-lg-4 d-flex">
           <div class="card dashboard-card shadow h-100 flex-fill">
             <div class="card-body text-center">
@@ -190,7 +203,7 @@
           </div>
         </div>
 
-        <!-- CARD 3: EVENTI A CUI PARTECIPO -->
+        <!-- CARD 4: EVENTI A CUI PARTECIPO -->
         <div class="col-md-6 col-lg-4 d-flex">
           <div class="card dashboard-card shadow h-100 flex-fill">
             <div class="card-body text-center">
@@ -198,7 +211,7 @@
               <p class="card-text">
                 Scopri a quali eventi sei iscritto e chatta con i partecipanti.
               </p>
-              <button class="btn btn-outline-primary w-75">Vai</button>
+              <button id="showMySubscribedBtn" class="btn btn-outline-primary w-75">Vai</button>
             </div>
           </div>
         </div>
@@ -220,6 +233,24 @@
 
         <div class="text-center mt-4">
           <button id="closeMyEventsBtn" class="btn btn-outline-secondary px-4">
+            Chiudi
+          </button>
+        </div>
+
+      </section>
+
+ 
+      <!-- ===================================================== -->
+      <!-- SEZIONE: EVENTI A CUI PARTECIPO                      -->
+      <!-- ===================================================== -->
+
+      <section id="mySubscribedEventsSection" class="d-none fade-in mt-5">
+        <h4 class="fw-bold text-center mb-4">Eventi a cui partecipo</h4>
+
+        <div id="mySubscribedEventsContainer" class="row g-4"></div>
+
+        <div class="text-center mt-4">
+          <button id="closeSubscribedEventsBtn" class="btn btn-outline-secondary px-4">
             Chiudi
           </button>
         </div>

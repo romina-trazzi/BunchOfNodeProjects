@@ -1,8 +1,11 @@
 const db = require("../models");
 const Event = db.Event;
+const Registration = db.Registration;
+const { Op } = db.Sequelize;
 
-
-// Funzione per creare gli eventi
+// ============================================================
+// CREA EVENTO + iscrizione automatica dell'organizzatore
+// ============================================================
 exports.createEvent = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -13,7 +16,7 @@ exports.createEvent = async (req, res) => {
       startsAt,
       capacity,
       category,
-      location,      
+      location,
       imageUrl
     } = req.body;
 
@@ -24,9 +27,14 @@ exports.createEvent = async (req, res) => {
       startsAt,
       capacity,
       category,
-      location,        
-      // location_geo: null,  // da implementare
+      location,
       imageUrl
+    });
+
+    // 🔹 L'organizzatore viene automaticamente iscritto come partecipante
+    await Registration.create({
+      userId: userId,
+      eventId: event.id
     });
 
     return res.status(201).json({
@@ -40,8 +48,9 @@ exports.createEvent = async (req, res) => {
   }
 };
 
-
-// Funzione per ottenere l'elenco degli eventi di un utente
+// ============================================================
+// RECUPERA EVENTI CREATI DALL'UTENTE
+// ============================================================
 exports.getMyEvents = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -59,54 +68,46 @@ exports.getMyEvents = async (req, res) => {
   }
 };
 
-
-// Funzione per eliminare un evento creato da un utente
+// ============================================================
+// ELIMINA EVENTO
+// ============================================================
 exports.deleteEvent = async (req, res) => {
   try {
     const eventId = req.params.id;
-    const userId = req.user.id; // preso dal token
+    const userId = req.user.id;
 
     const event = await Event.findByPk(eventId);
 
-    if (!event) {
-      return res.status(404).json({ error: 'Evento non trovato' });
-    }
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
+    if (event.ownerId !== userId)
+      return res.status(403).json({ error: "Non autorizzato a eliminare questo evento" });
 
-    // Solo il proprietario può eliminarlo
-    if (event.ownerId !== userId) {
-      return res.status(403).json({ error: 'Non autorizzato a eliminare questo evento' });
-    }
+    // elimina anche tutte le iscrizioni
+    await Registration.destroy({ where: { eventId } });
 
     await event.destroy();
 
-    return res.json({ message: 'Evento eliminato con successo' });
+    return res.json({ message: "Evento eliminato con successo" });
 
   } catch (error) {
-    console.error('Errore eliminazione evento:', error);
-    return res.status(500).json({ error: 'Errore del server' });
+    console.error("Errore eliminazione evento:", error);
+    return res.status(500).json({ error: "Errore del server" });
   }
 };
 
-
-// Funzione per aggiornare un evento  
+// ============================================================
+// UPDATE EVENTO
+// ============================================================
 exports.updateEvent = async (req, res) => {
   try {
     const eventId = req.params.id;
     const userId = req.user.id;
 
-    // Cerca l'evento
     const event = await Event.findByPk(eventId);
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
+    if (event.ownerId !== userId)
+      return res.status(403).json({ error: "Non autorizzato a modificare" });
 
-    if (!event) {
-      return res.status(404).json({ error: "Evento non trovato" });
-    }
-
-    // Sicurezza: solo il proprietario può modificare
-    if (event.ownerId !== userId) {
-      return res.status(403).json({ error: "Non autorizzato a modificare questo evento" });
-    }
-
-    // Dati aggiornabili
     const {
       title,
       description,
@@ -117,7 +118,6 @@ exports.updateEvent = async (req, res) => {
       imageUrl
     } = req.body;
 
-    // Aggiornamento
     await event.update({
       title: title ?? event.title,
       description: description ?? event.description,
@@ -128,13 +128,123 @@ exports.updateEvent = async (req, res) => {
       imageUrl: imageUrl ?? event.imageUrl
     });
 
-    return res.json({
-      message: "Evento aggiornato con successo",
-      event
-    });
+    return res.json({ message: "Evento aggiornato con successo", event });
 
   } catch (error) {
     console.error("Errore update evento:", error);
     return res.status(500).json({ error: "Errore del server" });
+  }
+};
+
+// ============================================================
+// CATALOGO EVENTI (con filtri ufficiali)
+// ============================================================
+exports.getAllEvents = async (req, res) => {
+  try {
+    const { title, month, category, location } = req.query;
+
+    const where = {};
+
+    if (title) where.title = { [Op.iLike]: `%${title}%` };
+
+    if (month) {
+      where.startsAt = db.Sequelize.where(
+        db.Sequelize.fn("to_char", db.Sequelize.col("startsAt"), "MM"),
+        month
+      );
+    }
+
+    if (category) where.category = category;
+    if (location) where.location = { [Op.iLike]: `%${location}%` };
+
+    const events = await Event.findAll({
+      where,
+      order: [["startsAt", "ASC"]],
+    });
+
+    res.json(events);
+
+  } catch (err) {
+    console.error("Errore getAllEvents:", err);
+    res.status(500).json({ error: "Errore nel recupero degli eventi" });
+  }
+};
+
+// ============================================================
+// EVENTI A CUI L’UTENTE È ISCRITTO
+// ============================================================
+exports.getSubscribedEvents = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const registrations = await Registration.findAll({
+      where: { userId },
+      include: [{ model: Event }]
+    });
+
+    const events = registrations.map(r => r.Event);
+
+    res.json(events);
+
+  } catch (err) {
+    console.error("Errore getSubscribedEvents:", err);
+    res.status(500).json({ error: "Errore nel recupero delle iscrizioni" });
+  }
+};
+
+// ============================================================
+// ISCRIZIONE EVENTO
+// ============================================================
+exports.subscribeToEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const userId = req.user.id;
+
+    const event = await Event.findByPk(eventId);
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
+
+    const exists = await Registration.findOne({
+      where: { userId, eventId }
+    });
+    if (exists) return res.status(400).json({ error: "Sei già iscritto" });
+
+    // controllo capienza
+    const count = await Registration.count({ where: { eventId } });
+    if (count >= event.capacity)
+      return res.status(400).json({ error: "Capienza massima raggiunta" });
+
+    await Registration.create({ userId, eventId });
+
+    res.json({ message: "Iscrizione effettuata" });
+
+  } catch (err) {
+    console.error("Errore subscribe:", err);
+    res.status(500).json({ error: "Errore del server" });
+  }
+};
+
+// ============================================================
+// DISISCRIZIONE EVENTO 
+// ============================================================
+exports.unsubscribeFromEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const userId = req.user.id;
+
+    const registration = await Registration.findOne({
+      where: { userId, eventId }
+    });
+
+    if (!registration) {
+      return res.status(400).json({ error: "Non risulti iscritto" });
+    }
+
+    await registration.destroy();
+
+    res.json({ message: "Disiscrizione effettuata" });
+
+  } catch (err) {
+    console.error("Errore unsubscribe:", err);
+    res.status(500).json({ error: "Errore del server" });
   }
 };

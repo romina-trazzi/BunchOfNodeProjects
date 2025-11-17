@@ -327,6 +327,109 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  // ============================================================
+  //  EVENTI A CUI PARTECIPA L'UTENTE
+  // ============================================================
+
+  const showMySubscribedBtn = document.getElementById("showMySubscribedBtn");
+  const mySubscribedEventsSection = document.getElementById("mySubscribedEventsSection");
+  const mySubscribedEventsContainer = document.getElementById("mySubscribedEventsContainer");
+  const closeSubscribedEventsBtn = document.getElementById("closeSubscribedEventsBtn");
+
+  // Funzione per caricare gli eventi a cui l’utente è iscritto
+  async function loadMySubscribedEvents() {
+    mySubscribedEventsContainer.innerHTML = `
+      <div class="text-center py-3">
+        <div class="spinner-border text-primary"></div>
+        <p class="text-muted mt-2">Caricamento eventi...</p>
+      </div>
+    `;
+
+    const events = await tokenFetch("/api/events/subscribed");
+
+    mySubscribedEventsContainer.innerHTML = "";
+
+    if (!events || events.length === 0) {
+      mySubscribedEventsContainer.innerHTML = `
+        <p class="text-center text-muted">Non sei iscritto ad alcun evento.</p>
+      `;
+      return;
+    }
+
+    
+    events.forEach(evt => {
+      const col = document.createElement("div");
+      col.classList.add("col-md-4", "d-flex");
+
+      const card = document.createElement("div");
+      card.classList.add("card", "shadow-sm", "event-card", "flex-fill");
+
+      const body = document.createElement("div");
+      body.classList.add("event-card-body", "d-flex", "flex-column");
+
+      const title = document.createElement("h5");
+      title.classList.add("fw-bold");
+      title.textContent = evt.title;
+
+      const date = document.createElement("p");
+      date.classList.add("text-muted");
+      date.textContent = evt.startsAt.split("T")[0];
+
+      const loc = document.createElement("p");
+      loc.innerHTML = `<strong>Luogo:</strong> ${evt.location}`;
+
+      const cat = document.createElement("p");
+      cat.innerHTML = `<strong>Categoria:</strong> ${evt.category}`;
+
+      const desc = document.createElement("p");
+      desc.classList.add("card-description");
+      desc.innerHTML = `<strong>Descrizione:</strong> ${evt.description}`;
+
+      const badge = document.createElement("span");
+      badge.classList.add("badge", "bg-success", "mb-2");
+      badge.textContent = "Iscritto";
+
+      const btnGroup = document.createElement("div");
+      btnGroup.classList.add("d-flex", "justify-content-between", "mt-auto");
+
+      const unsubBtn = document.createElement("button");
+      unsubBtn.classList.add("btn", "btn-danger", "btn-sm");
+      unsubBtn.textContent = "Disiscriviti";
+
+      unsubBtn.addEventListener("click", async () => {
+        await tokenFetch(`/api/events/${evt.id}/unsubscribe`, { method: "DELETE" });
+        loadMySubscribedEvents();
+      });
+
+      btnGroup.append(unsubBtn);
+
+      body.append(badge, title, date, loc, cat, desc, btnGroup);
+      card.appendChild(body);
+      col.appendChild(card);
+      mySubscribedEventsContainer.appendChild(col);
+    });
+  }
+
+  // Pulsante "Apri"
+  showMySubscribedBtn?.addEventListener("click", async () => {
+    mainCardsRow.classList.add("d-none");
+    myEventsSection.classList.add("d-none");
+    createEventSection.classList.add("d-none");
+
+    mySubscribedEventsSection.classList.remove("d-none");
+
+    await loadMySubscribedEvents();
+  });
+
+  // Pulsante "Chiudi"
+  closeSubscribedEventsBtn?.addEventListener("click", () => {
+    mySubscribedEventsSection.classList.add("d-none");
+    mainCardsRow.classList.remove("d-none");
+  });
+
+  document.getElementById("openCatalogueBtn")?.addEventListener("click", () => {
+    window.location.href = "./catalogue.html";
+  });
 
 
 
