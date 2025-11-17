@@ -27,29 +27,29 @@ const io = socketIo(server);
 io.on('connection', (socket) => {
   console.log('Un client si è connesso:', socket.id);
 
-  // 🔹 Il client entra nella "stanza" dell'evento
+  // Il client entra nella "stanza" dell'evento
   socket.on('join-event', (eventId) => {
     socket.join(eventId);
     console.log(`Socket ${socket.id} è entrato nella stanza evento ${eventId}`);
   });
 
-  // 🔹 Quando arriva un messaggio -> lo inviamo SOLO alla stanza dell’evento
+  // Quando arriva un messaggio -> lo inviamo SOLO alla stanza dell’evento
   socket.on('new-message', (data) => {
     console.log(`Messaggio in evento ${data.eventId}:`, data.message);
     socket.to(data.eventId).emit('new-message', data);
   });
 
-  // 🔹 Notifica live: iscrizione
+  //  Notifica live: iscrizione
   socket.on('new-registration', (data) => {
     socket.to(data.eventId).emit('new-registration', data);
   });
 
-  // 🔹 Notifica live: disiscrizione
+  // Notifica live: disiscrizione
   socket.on('user-unsubscribed', (data) => {
     socket.to(data.eventId).emit('user-unsubscribed', data);
   });
 
-  // 🔹 Notifica agli admin: evento segnalato
+  // Notifica agli admin: evento segnalato
   socket.on('event-reported', (data) => {
     io.emit('event-reported', data);
   });
@@ -60,7 +60,56 @@ io.on('connection', (socket) => {
 });
 
 // Configurazione sicurezza e body parsing
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        "default-src": ["'self'"],
+
+        "script-src": [
+          "'self'"
+        ],
+
+        "script-src-elem": [
+          "'self'",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com"
+        ],
+
+        // IMPORTANTE: niente "script-src-attr"
+        // Bootstrap non funziona con script-src-attr attivo.
+
+        "style-src": [
+          "'self'",
+          "https://cdn.jsdelivr.net",
+          "https://fonts.googleapis.com",
+          "'unsafe-inline'"
+        ],
+
+        "font-src": [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "https://cdn.jsdelivr.net"
+        ],
+
+        "img-src": [
+          "'self'",
+          "data:",
+          "https://cdn.jsdelivr.net"
+        ],
+
+        "connect-src": [
+          "'self'",
+          "ws://localhost:4000",
+          "http://localhost:4000"
+        ]
+      }
+    },
+    crossOriginEmbedderPolicy: false
+  })
+);
+
+
 app.use(express.json());
 
 // Serve static assets (CSS, JS, images, etc.)
@@ -100,6 +149,42 @@ app.use("/api/admin", adminRoutes);
     console.error('❌ Failed to start server:', err.message);
     process.exit(1);
   }
+
+  app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "script-src": [
+          "'self'"
+        ],
+        "script-src-elem": [
+          "'self'",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com"
+        ],
+        "style-src": [
+          "'self'",
+          "https://cdn.jsdelivr.net",
+          "https://fonts.googleapis.com"
+        ],
+        "font-src": [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "https://cdn.jsdelivr.net"
+        ],
+        "img-src": [
+          "'self'",
+          "data:",
+          "https://cdn.jsdelivr.net"
+        ]
+      }
+    },
+    crossOriginEmbedderPolicy: false
+  })
+  );
+
 })();
 
 module.exports = app;

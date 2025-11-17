@@ -1,120 +1,32 @@
-const db = require("../models");
-const Event = db.Event;
-const Registration = db.Registration;
-const User = db.User;
-const { Op } = db.Sequelize;
-const io = require('socket.io');
+// server/src/controllers/eventController.js
 
-// ============================================================
-// CREA EVENTO + iscrizione automatica dell'organizzatore
-// ============================================================
+/**
+ * EVENT CONTROLLER COMPLETO
+ * -------------------------
+ * Gestisce:
+ *  - CRUD eventi
+ *  - Filtri catalogo
+ *  - Iscrizione / disiscrizione
+ *  - Eventi pending per admin
+ *  - Approvazione / Rifiuto eventi
+ *  - Chat in tempo reale (socket.io via req.app.get("io"))
+ */
+
+const { Event, User, Registration, Message } = require("../models");
+const { Op } = require("sequelize");
+
+/* ============================================================
+   CREA EVENTO
+   - USER → PENDING
+   - ADMIN → APPROVED
+   - Organizzatore automaticamente iscritto
+============================================================ */
 exports.createEvent = async (req, res) => {
   try {
-    // ID dell'utente preso dal token JWT
     const userId = req.user.id;
+    const role = req.user.role;
 
-    // Se admin → evento approvato immediatamente
-    const status = req.user.role === "ADMIN" ? "APPROVED" : "PENDING";
-
-    const {
-      title,
-      description,
-      startsAt,
-      capacity,
-      category,
-      location,
-      imageUrl,
-    } = req.body;
-
-    // Creazione evento
-    const event = await Event.create({
-      ownerId: userId,
-      title,
-      description,
-      startsAt,
-      capacity,
-      category,
-      location,
-      imageUrl,
-      status  
-    });
-
-    // Organizzatore iscritto automaticamente
-    await Registration.create({
-      userId: userId,
-      eventId: event.id,
-    });
-
-    return res.status(201).json({
-      message: "Evento creato con successo",
-      event
-    });
-
-  } catch (error) {
-    console.error("Errore createEvent:", error);
-    res.status(500).json({ error: "Errore durante la creazione dell’evento" });
-  }
-};
-
-// ============================================================
-// RECUPERA EVENTI CREATI DALL'UTENTE
-// ============================================================
-exports.getMyEvents = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const events = await Event.findAll({
-      where: { ownerId: userId },
-      order: [["startsAt", "ASC"]],
-    });
-
-    return res.json(events);
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Errore durante il recupero degli eventi" });
-  }
-};
-
-// ============================================================
-// ELIMINA EVENTO
-// ============================================================
-exports.deleteEvent = async (req, res) => {
-  try {
-    const eventId = req.params.id;
-    const userId = req.user.id;
-
-    const event = await Event.findByPk(eventId);
-
-    if (!event) return res.status(404).json({ error: "Evento non trovato" });
-    if (event.ownerId !== userId)
-      return res.status(403).json({ error: "Non autorizzato a eliminare questo evento" });
-
-    // elimina anche tutte le iscrizioni
-    await Registration.destroy({ where: { eventId } });
-
-    await event.destroy();
-
-    return res.json({ message: "Evento eliminato con successo" });
-
-  } catch (error) {
-    console.error("Errore eliminazione evento:", error);
-    return res.status(500).json({ error: "Errore del server" });
-  }
-};
-
-// ============================================================
-// UPDATE EVENTO
-// ============================================================
-exports.updateEvent = async (req, res) => {
-  try {
-    const eventId = req.params.id;
-    const userId = req.user.id;
-
-    const event = await Event.findByPk(eventId);
-    if (!event) return res.status(404).json({ error: "Evento non trovato" });
-    if (event.ownerId !== userId)
-      return res.status(403).json({ error: "Non autorizzato a modificare" });
+    const status = role === "ADMIN" ? "APPROVED" : "PENDING";
 
     const {
       title,
@@ -126,177 +38,277 @@ exports.updateEvent = async (req, res) => {
       imageUrl
     } = req.body;
 
-    await event.update({
-      title: title ?? event.title,
-      description: description ?? event.description,
-      startsAt: startsAt ?? event.startsAt,
-      capacity: capacity ?? event.capacity,
-      category: category ?? event.category,
-      location: location ?? event.location,
-      imageUrl: imageUrl ?? event.imageUrl
+    const event = await Event.create({
+      ownerId: userId,
+      title,
+      description,
+      startsAt,
+      capacity,
+      category,
+      location,
+      imageUrl,
+      status
     });
 
-    return res.json({ message: "Evento aggiornato con successo", event });
+    // Organizzatore → iscritto automaticamente
+    await Registration.create({
+      userId,
+      eventId: event.id
+    });
 
-  } catch (error) {
-    console.error("Errore update evento:", error);
-    return res.status(500).json({ error: "Errore del server" });
+    return res.status(201).json({
+      message: "Evento creato con successo",
+      event
+    });
+
+  } catch (err) {
+    console.error("Errore createEvent:", err);
+    res.status(500).json({ error: "Errore durante la creazione dell'evento" });
   }
 };
 
-// ============================================================
-// CATALOGO EVENTI (con filtri ufficiali)
-// ============================================================
+
+
+/* ============================================================
+   CATALOGO EVENTI PUBBLICI APPROVATI + FILTRI
+============================================================ */
 exports.getAllEvents = async (req, res) => {
   try {
     const { title, month, category, location } = req.query;
 
-    const baseOr = { [Op.or]: [ { status: "APPROVED" }, { ownerId: req.user.id } ] };
-    const andConditions = [ baseOr ];
+    const where = { status: "APPROVED" };
 
-    if (title) andConditions.push({ title: { [Op.iLike]: `%${title}%` } });
-    if (category) andConditions.push({ category });
-    if (location) andConditions.push({ location: { [Op.iLike]: `%${location}%` } });
-    if (month) andConditions.push(db.Sequelize.where(
-      db.Sequelize.fn("to_char", db.Sequelize.col("startsAt"), "MM"),
-      month
-    ));
+    if (title) where.title = { [Op.iLike]: `%${title}%` };
+    if (category) where.category = category;
+    if (location) where.location = { [Op.iLike]: `%${location}%` };
+
+    if (month) {
+      where.startsAt = {
+        [Op.and]: [
+          Event.sequelize.where(
+            Event.sequelize.fn("to_char", Event.sequelize.col("startsAt"), "MM"),
+            month
+          )
+        ]
+      };
+    }
 
     const events = await Event.findAll({
-      where: { [Op.and]: andConditions },
-      order: [["startsAt", "ASC"]],
+      where,
+      order: [["startsAt", "ASC"]]
     });
 
     res.json(events);
 
   } catch (err) {
     console.error("Errore getAllEvents:", err);
-    res.status(500).json({ error: "Errore nel recupero degli eventi" });
+    res.status(500).json({ error: "Errore nel recupero eventi" });
   }
 };
 
-// ============================================================
-// EVENTI A CUI L’UTENTE È ISCRITTO
-// ============================================================
-exports.getSubscribedEvents = async (req, res) => {
+
+
+/* ============================================================
+   EVENTI CREATI DALL'UTENTE
+============================================================ */
+exports.getMyEvents = async (req, res) => {
   try {
-    const userId = req.user.id;
-
-    const registrations = await Registration.findAll({
-      where: { userId },
-      include: [{ model: Event }]
+    const events = await Event.findAll({
+      where: { ownerId: req.user.id },
+      order: [["startsAt", "ASC"]]
     });
-
-    const events = registrations.map(r => r.Event);
 
     res.json(events);
 
   } catch (err) {
-    console.error("Errore getSubscribedEvents:", err);
-    res.status(500).json({ error: "Errore nel recupero delle iscrizioni" });
+    console.error("Errore getMyEvents:", err);
+    res.status(500).json({ error: "Errore nel recupero degli eventi" });
   }
 };
 
-// ============================================================
-// ISCRIZIONE EVENTO
-// ============================================================
+
+
+/* ============================================================
+   EVENTI A CUI L'UTENTE È ISCRITTO
+============================================================ */
+exports.getSubscribedEvents = async (req, res) => {
+  try {
+    const registrations = await Registration.findAll({
+      where: { userId: req.user.id },
+      include: [{ model: Event }]
+    });
+
+    const events = registrations.map(r => r.Event);
+    res.json(events);
+
+  } catch (err) {
+    console.error("Errore getSubscribedEvents:", err);
+    res.status(500).json({ error: "Errore nel recupero degli eventi iscritti" });
+  }
+};
+
+
+
+/* ============================================================
+   MODIFICA EVENTO
+============================================================ */
+exports.updateEvent = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const event = await Event.findByPk(id);
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
+
+    if (event.ownerId !== req.user.id && req.user.role !== "ADMIN") {
+      return res.status(403).json({ error: "Non autorizzato" });
+    }
+
+    await event.update(req.body);
+
+    res.json({
+      message: "Evento aggiornato",
+      event
+    });
+
+  } catch (err) {
+    console.error("Errore updateEvent:", err);
+    res.status(500).json({ error: "Errore nella modifica dell’evento" });
+  }
+};
+
+
+
+/* ============================================================
+   CANCELLA EVENTO
+============================================================ */
+exports.deleteEvent = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const event = await Event.findByPk(id);
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
+
+    if (event.ownerId !== req.user.id && req.user.role !== "ADMIN") {
+      return res.status(403).json({ error: "Non autorizzato" });
+    }
+
+    await event.destroy();
+    res.json({ message: "Evento eliminato" });
+
+  } catch (err) {
+    console.error("Errore deleteEvent:", err);
+    res.status(500).json({ error: "Errore cancellazione evento" });
+  }
+};
+
+
+
+/* ============================================================
+   ISCRIZIONE AD UN EVENTO (notifica Socket.io)
+============================================================ */
 exports.subscribeToEvent = async (req, res) => {
   try {
-    const eventId = req.params.id;
     const userId = req.user.id;
+    const eventId = req.params.id;
+
+    const io = req.app.get("io"); // <- socket.io dal server
 
     const event = await Event.findByPk(eventId);
     if (!event) return res.status(404).json({ error: "Evento non trovato" });
 
-    const exists = await Registration.findOne({
-      where: { userId, eventId }
-    });
-    if (exists) return res.status(400).json({ error: "Sei già iscritto" });
-
-    // controllo capienza
-    const count = await Registration.count({ where: { eventId } });
-    if (count >= event.capacity)
-      return res.status(400).json({ error: "Capienza massima raggiunta" });
+    const exists = await Registration.findOne({ where: { userId, eventId }});
+    if (exists) return res.json({ message: "Già iscritto" });
 
     await Registration.create({ userId, eventId });
 
-    res.json({ message: "Iscrizione effettuata" });
+    io.to(eventId).emit("new-registration", { eventId, userId });
+
+    res.json({ message: "Iscrizione avvenuta" });
 
   } catch (err) {
-    console.error("Errore subscribe:", err);
-    res.status(500).json({ error: "Errore del server" });
+    console.error("Errore subscribeToEvent:", err);
+    res.status(500).json({ error: "Errore iscrizione" });
   }
 };
 
-// ============================================================
-// DISISCRIZIONE EVENTO 
-// ============================================================
+
+
+/* ============================================================
+   DISISCRIZIONE EVENTO (notifica Socket.io)
+============================================================ */
 exports.unsubscribeFromEvent = async (req, res) => {
   try {
-    const eventId = req.params.id;
     const userId = req.user.id;
+    const eventId = req.params.id;
 
-    const registration = await Registration.findOne({
-      where: { userId, eventId }
-    });
+    const io = req.app.get("io");
 
-    if (!registration) {
-      return res.status(400).json({ error: "Non risulti iscritto" });
-    }
+    const reg = await Registration.findOne({ where: { userId, eventId }});
+    if (!reg) return res.json({ message: "Non eri iscritto" });
 
-    await registration.destroy();
+    await reg.destroy();
 
-    res.json({ message: "Disiscrizione effettuata" });
+    io.to(eventId).emit("user-unsubscribed", { eventId, userId });
+
+    res.json({ message: "Disiscrizione avvenuta" });
 
   } catch (err) {
-    console.error("Errore unsubscribe:", err);
-    res.status(500).json({ error: "Errore del server" });
+    console.error("Errore unsubscribeFromEvent:", err);
+    res.status(500).json({ error: "Errore disiscrizione" });
   }
 };
 
-// ============================================================
-// ADMIN AREA
-// ============================================================
 
-// Approva evento
+
+/* ============================================================
+   ADMIN → APPROVA EVENTO
+============================================================ */
 exports.approveEvent = async (req, res) => {
   try {
     const id = req.params.id;
-    const event = await Event.findByPk(id);
 
-    if (!event) {
-      return res.status(404).json({ error: "Evento non trovato" });
-    }
+    const event = await Event.findByPk(id);
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
 
     event.status = "APPROVED";
     await event.save();
 
-    res.json({ message: "Evento approvato con successo", event });
+    res.json({ message: "Evento approvato" });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Errore approveEvent:", err);
+    res.status(500).json({ error: "Errore approvazione" });
   }
 };
 
-// Rifiuta evento
+
+
+/* ============================================================
+   ADMIN → RIFIUTA EVENTO
+============================================================ */
 exports.rejectEvent = async (req, res) => {
   try {
     const id = req.params.id;
-    const event = await Event.findByPk(id);
 
-    if (!event) {
-      return res.status(404).json({ error: "Evento non trovato" });
-    }
+    const event = await Event.findByPk(id);
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
 
     event.status = "REJECTED";
     await event.save();
 
-    res.json({ message: "Evento rifiutato", event });
+    res.json({ message: "Evento rifiutato" });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Errore rejectEvent:", err);
+    res.status(500).json({ error: "Errore rifiuto" });
   }
 };
 
-// Lista eventi PENDING 
+
+
+/* ============================================================
+   ADMIN → EVENTI PENDING CON AUTORE
+============================================================ */
 exports.getPendingEvents = async (req, res) => {
   try {
     const events = await Event.findAll({
@@ -304,7 +316,7 @@ exports.getPendingEvents = async (req, res) => {
       include: [
         {
           model: User,
-          as: "User",              
+          as: "User", // <- importante per ev.User.username
           attributes: ["username", "email"]
         }
       ],
@@ -315,82 +327,40 @@ exports.getPendingEvents = async (req, res) => {
 
   } catch (err) {
     console.error("Errore getPendingEvents:", err);
-    res.status(500).json({ error: "Errore nel recupero degli eventi" });
+    res.status(500).json({ error: "Errore recupero pending" });
   }
 };
 
-// ============================================================
-// SOCKET.IO
-// ============================================================ 
 
 
-
-// Iscrizione utente a un evento
-exports.subscribeToEvent = async (req, res) => {
-  const userId = req.user.id;
-  const eventId = req.params.id;
-
+/* ============================================================
+   CHAT: INVIA MESSAGGIO NELL'EVENTO
+============================================================ */
+exports.sendMessageToEvent = async (req, res) => {
   try {
-    const event = await Event.findByPk(eventId);
-    if (!event) return res.status(404).json({ error: "Evento non trovato" });
+    const eventId = req.params.id;
+    const userId = req.user.id;
+    const { message } = req.body;
 
-    const registration = await Registration.create({
-      userId: userId,
-      eventId: eventId
+    const io = req.app.get("io");
+
+    const saved = await Message.create({
+      eventId,
+      userId,
+      message
     });
 
-    // Notifica via socket agli altri partecipanti
-    io.to(eventId).emit('new-registration', { userId, eventId });
-
-    res.status(201).json({ message: "Iscrizione avvenuta con successo", registration });
-  } catch (err) {
-    console.error("Errore iscrizione:", err);
-    res.status(500).json({ error: "Errore nell'iscrizione all'evento" });
-  }
-};
-
-// Disiscrizione utente da un evento
-exports.unsubscribeFromEvent = async (req, res) => {
-  const userId = req.user.id;
-  const eventId = req.params.id;
-
-  try {
-    const registration = await Registration.findOne({
-      where: { userId, eventId }
+    io.to(eventId).emit("new-message", {
+      eventId,
+      userId,
+      message,
+      createdAt: saved.createdAt
     });
 
-    if (!registration) return res.status(404).json({ error: "Iscrizione non trovata" });
+    res.json({ message: "Messaggio inviato", saved });
 
-    await registration.destroy();
-
-    // Notifica via socket agli altri partecipanti
-    io.to(eventId).emit('user-unsubscribed', { userId, eventId });
-
-    res.status(200).json({ message: "Disiscrizione avvenuta con successo" });
   } catch (err) {
-    console.error("Errore disiscrizione:", err);
-    res.status(500).json({ error: "Errore nella disiscrizione dall'evento" });
-  }
-};
-
-// Segnalazione evento
-exports.reportEvent = async (req, res) => {
-  const eventId = req.params.id;
-
-  try {
-    const event = await Event.findByPk(eventId);
-    if (!event) return res.status(404).json({ error: "Evento non trovato" });
-
-    // Segna l'evento come "segnalato"
-    event.status = "REPORTED"; // O qualsiasi altro stato desiderato
-    await event.save();
-
-    // Notifica agli admin via socket
-    io.emit('event-reported', { eventId, message: "Un evento è stato segnalato!" });
-
-    res.status(200).json({ message: "Evento segnalato con successo" });
-  } catch (err) {
-    console.error("Errore segnalazione evento:", err);
-    res.status(500).json({ error: "Errore nella segnalazione dell'evento" });
+    console.error("Errore sendMessage:", err);
+    res.status(500).json({ error: "Errore invio messaggio" });
   }
 };
