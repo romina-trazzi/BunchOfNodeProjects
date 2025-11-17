@@ -72,3 +72,29 @@ async function reject(id) {
 }
 
 loadPendingEvents();
+
+/* area socket.io */    
+
+
+// Connessione al server via Socket.io
+const socket = io("http://localhost:4000");
+
+// Ascolta la notifica di nuova iscrizione
+socket.on('new-registration', (data) => {
+  console.log("Nuova iscrizione:", data);
+  // Logica per aggiornare la lista eventi in tempo reale
+  loadPendingEvents();
+});
+
+// Ascolta la notifica di disiscrizione
+socket.on('user-unsubscribed', (data) => {
+  console.log("Disiscrizione evento:", data);
+  // Logica per aggiornare la lista eventi in tempo reale
+  loadPendingEvents();
+});
+
+// Ascolta la notifica di evento segnalato
+socket.on('event-reported', (data) => {
+  console.log("Evento segnalato:", data);
+  // Logica per mostrare un messaggio di notifica agli admin
+});

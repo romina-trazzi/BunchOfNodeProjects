@@ -3,6 +3,7 @@ const Event = db.Event;
 const Registration = db.Registration;
 const User = db.User;
 const { Op } = db.Sequelize;
+const io = require('socket.io');
 
 // ============================================================
 // CREA EVENTO + iscrizione automatica dell'organizzatore
@@ -35,7 +36,7 @@ exports.createEvent = async (req, res) => {
       category,
       location,
       imageUrl,
-      status   // <<< AGGIUNTO QUI
+      status  
     });
 
     // Organizzatore iscritto automaticamente
@@ -315,5 +316,81 @@ exports.getPendingEvents = async (req, res) => {
   } catch (err) {
     console.error("Errore getPendingEvents:", err);
     res.status(500).json({ error: "Errore nel recupero degli eventi" });
+  }
+};
+
+// ============================================================
+// SOCKET.IO
+// ============================================================ 
+
+
+
+// Iscrizione utente a un evento
+exports.subscribeToEvent = async (req, res) => {
+  const userId = req.user.id;
+  const eventId = req.params.id;
+
+  try {
+    const event = await Event.findByPk(eventId);
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
+
+    const registration = await Registration.create({
+      userId: userId,
+      eventId: eventId
+    });
+
+    // Notifica via socket agli altri partecipanti
+    io.to(eventId).emit('new-registration', { userId, eventId });
+
+    res.status(201).json({ message: "Iscrizione avvenuta con successo", registration });
+  } catch (err) {
+    console.error("Errore iscrizione:", err);
+    res.status(500).json({ error: "Errore nell'iscrizione all'evento" });
+  }
+};
+
+// Disiscrizione utente da un evento
+exports.unsubscribeFromEvent = async (req, res) => {
+  const userId = req.user.id;
+  const eventId = req.params.id;
+
+  try {
+    const registration = await Registration.findOne({
+      where: { userId, eventId }
+    });
+
+    if (!registration) return res.status(404).json({ error: "Iscrizione non trovata" });
+
+    await registration.destroy();
+
+    // Notifica via socket agli altri partecipanti
+    io.to(eventId).emit('user-unsubscribed', { userId, eventId });
+
+    res.status(200).json({ message: "Disiscrizione avvenuta con successo" });
+  } catch (err) {
+    console.error("Errore disiscrizione:", err);
+    res.status(500).json({ error: "Errore nella disiscrizione dall'evento" });
+  }
+};
+
+// Segnalazione evento
+exports.reportEvent = async (req, res) => {
+  const eventId = req.params.id;
+
+  try {
+    const event = await Event.findByPk(eventId);
+    if (!event) return res.status(404).json({ error: "Evento non trovato" });
+
+    // Segna l'evento come "segnalato"
+    event.status = "REPORTED"; // O qualsiasi altro stato desiderato
+    await event.save();
+
+    // Notifica agli admin via socket
+    io.emit('event-reported', { eventId, message: "Un evento è stato segnalato!" });
+
+    res.status(200).json({ message: "Evento segnalato con successo" });
+  } catch (err) {
+    console.error("Errore segnalazione evento:", err);
+    res.status(500).json({ error: "Errore nella segnalazione dell'evento" });
   }
 };
