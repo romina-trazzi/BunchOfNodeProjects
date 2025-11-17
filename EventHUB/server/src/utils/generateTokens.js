@@ -1,4 +1,3 @@
-// Importing jwt library
 const jwt = require("jsonwebtoken");
 
 // Function to generate access token

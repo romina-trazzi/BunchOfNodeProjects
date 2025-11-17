@@ -1,4 +1,3 @@
-// main.js
 console.log("Frontend ready ✅");
 
 const loginForm = document.getElementById("loginForm");
@@ -20,7 +19,6 @@ if (loginForm) {
       if (res.ok) {
         alert("Login avvenuto con successo ✅");
         console.log("Token:", data.token);
-        // In futuro: salva token e redirect a dashboard
       } else {
         alert(data.error || "Credenziali non valide ❌");
       }

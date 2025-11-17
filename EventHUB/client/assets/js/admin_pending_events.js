@@ -103,7 +103,7 @@ async function reject(id) {
 loadPendingEvents();
 
 // ===============================================
-// SOCKET.IO (corretto percorso client-side)
+// SOCKET.IO
 // ===============================================
 const socket = io();
 

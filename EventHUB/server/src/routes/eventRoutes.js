@@ -19,6 +19,7 @@ router.post("/:id/subscribe", authenticateToken, eventController.subscribeToEven
 router.delete("/:id/unsubscribe", authenticateToken, eventController.unsubscribeFromEvent);
 
 // Messaggi chat
+
 // CHAT: ottieni messaggi dell'evento
 router.get("/:id/messages", authenticateToken, eventController.getEventMessages);
 

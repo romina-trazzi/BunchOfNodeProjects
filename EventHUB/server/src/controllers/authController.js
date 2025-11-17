@@ -1,6 +1,4 @@
-// server/src/controllers/authControllers.js
 
-// Import required modules
 const { User } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -12,7 +10,6 @@ const { generateAccessToken, generateRefreshToken } = require("../utils/generate
 ============================ */
 exports.register = async (req, res) => {
   try {
-    // Validate incoming data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -20,7 +17,7 @@ exports.register = async (req, res) => {
 
     const { username, email, password } = req.body;
 
-    // Check if user already exists (by email)
+    // Utente già esistente (verifica mail)
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(409).json({ error: "Email already registered" });
@@ -30,12 +27,12 @@ exports.register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
+    // Creazione nuovo utente
     const newUser = await User.create({
       username,
       email,
       passwordHash: hashedPassword,
-      role: "USER", // Must be uppercase to match ENUM
+      role: "USER", 
     });
 
     console.log("✅ New user created:", newUser.username);
@@ -65,16 +62,16 @@ exports.register = async (req, res) => {
 ============================ */
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body; // email field may contain username or email
+    const { email, password } = req.body; // nome o email
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email/Username and password are required" });
     }
 
-    // Determine if input is email or username
+    // Mail o username?
     const isEmail = email.includes("@");
 
-    // Find user
+    // Trova utente per email
     const whereClause = isEmail ? { email } : { username: email };
     const user = await User.findOne({ where: whereClause });
 
@@ -82,13 +79,13 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // Compare password
+    // Compara password
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // Generate tokens
+    // Genera token
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 

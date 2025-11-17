@@ -1,5 +1,3 @@
-// middleware/isAdmin.js
-
 module.exports = (req, res, next) => {
   // req.user arriva dal middleware di autenticazione JWT
   if (req.user.role !== "ADMIN") {

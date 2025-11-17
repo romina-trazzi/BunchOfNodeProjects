@@ -1,7 +1,5 @@
-// server/src/controllers/eventController.js
-
 /**
- * EVENT CONTROLLER COMPLETO
+ * EVENT CONTROLLER 
  * -------------------------
  * Gestisce:
  *  - CRUD eventi
@@ -431,7 +429,7 @@ exports.sendMessageToEvent = async (req, res) => {
 
     const io = req.app.get("io");
 
-    // Recupero username per spedire un evento più ricco
+   
     const user = await User.findByPk(userId);
 
     // Socket.io → invia a tutti nella stanza

@@ -4,7 +4,7 @@ const socketIo = require('socket.io');
 require('dotenv').config();
 const path = require('path');
 const helmet = require('helmet');
-const cors = require('cors');
+
 
 // Import the Sequelize connection and retry helper
 const { sequelize, connectWithRetry } = require('./config/db_connection');

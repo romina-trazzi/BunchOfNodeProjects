@@ -1,17 +1,16 @@
-// client/assets/js/login.js
 console.log("Login page ready ✅");
 
 const form = document.getElementById("loginForm");
 
 /* ---------------------------
- * If user already logged in, skip login page
+ * UTENTE GIA' LOGGATO, SALTA IL LOGIN
  * --------------------------- */
 if (localStorage.getItem("accessToken")) {
   window.location.href = "assets/pages/dashboard.html";
 }
 
 /* ---------------------------
- * Form submission handler
+ * FORM SUBMIT
  * --------------------------- */
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -34,7 +33,7 @@ form.addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      // ✅ Save tokens locally
+      // Salva token e dati utente in localStorage
       localStorage.setItem("accessToken", data.tokens.accessToken);
       localStorage.setItem("refreshToken", data.tokens.refreshToken);
       if (data.user?.id) localStorage.setItem("userId", data.user.id);
@@ -43,7 +42,7 @@ form.addEventListener("submit", async (e) => {
       localStorage.setItem("userId", data.user.id);
 
       alert(`Bentornato, ${data.user.username}! 🎉`);
-      // ✅ Redirect to dashboard
+      // Redirect alla dashboard
       window.location.href = "assets/pages/dashboard.html";
     } else {
       alert(data.error || "Credenziali non valide ❌");

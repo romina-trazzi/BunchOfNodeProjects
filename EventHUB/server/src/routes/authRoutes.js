@@ -8,7 +8,7 @@ const authenticateToken = require("../middlewares/authMiddleware");
 console.log("DEBUG authMiddleware IMPORT =", authenticateToken);
 console.log("TYPE =", typeof authenticateToken);
 
-// Route to register a new user
+// Route per registrare un nuovo utente
 router.post(
   "/register",
   [

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMDB Project</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Stili base rapidi */
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    section { margin-bottom: 40px; }
+    input { margin: 5px; padding: 5px; }
+    button { margin: 5px; padding: 5px 10px; }
+    .hidden { display: none; }
+    .movie-card { border: 1px solid #ccc; padding: 10px; margin: 10px 0; max-width: 300px; }
+    .movie-card img { max-width: 100%; }
+    .movie-info span { display: block; margin: 2px 0; }
+    #messages { margin-bottom: 20px; font-weight: bold; }
+    .filters { margin-bottom: 10px; }
+    .filters input { width: calc(100% - 12px); }
+  </style>
+</head>
+<body>
+
+  <!-- Messaggi di sistema -->
+  <div id="messages"></div>
+
+  <!-- --- Sezione Autenticazione --- -->
+  <section id="authSection">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+
+    <h2>Registrazione</h2>
+    <form id="registerForm">
+      <input type="text" id="regUsername" placeholder="Username" required>
+      <input type="email" id="regEmail" placeholder="Email" required>
+      <input type="password" id="regPassword" placeholder="Password" required>
+      <button type="submit">Registrati</button>
+    </form>
+  </section>
+
+  <!-- --- Sezione Profilo --- -->
+  <section id="profileSection" class="hidden">
+    <h2>Profilo Utente</h2>
+    <pre id="profileData"></pre>
+    <button id="btnLogout" type="button">Logout</button>
+  </section>
+
+  <!-- --- Sezione Ricerca TMDB --- -->
+  <section id="tmdbSection" class="hidden">
+    <h2>Ricerca Film TMDB</h2>
+    <form id="searchForm">
+      <div class="filters">
+        <input type="text" id="query" placeholder="Titolo">
+        <input type="text" id="filterGenre" placeholder="Genere">
+        <input type="text" id="filterDirector" placeholder="Regista">
+        <input type="text" id="filterYear" placeholder="Anno di uscita">
+      </div>
+      <button type="submit">Cerca</button>
+    </form>
+    <div id="results"></div>
+  </section>
+
+  <!-- --- Sezione Film DB Locale --- -->
+  <section id="moviesSection" class="hidden">
+    <h2>Film Salvati nel DB Locale</h2>
+
+    <!-- Filtri locali -->
+    <div id="localFilters" class="filters">
+      <input type="text" id="dbFilterTitle" placeholder="Titolo">
+      <input type="text" id="dbFilterGenre" placeholder="Genere">
+      <input type="text" id="dbFilterDirector" placeholder="Regista">
+      <input type="text" id="dbFilterYear" placeholder="Anno di uscita">
+      <button id="btnLoadMovies">Carica Film</button>
+    </div>
+
+    <div id="moviesList"></div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>

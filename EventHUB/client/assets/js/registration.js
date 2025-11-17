@@ -30,7 +30,6 @@ form.addEventListener("submit", async (e) => {
       alert("Registrazione avvenuta con successo 🎉");
       window.location.href = "../../index.html";
    } else if (data.errors) {
-      // ✅ Show validation messages
       alert(data.errors.map(e => e.msg).join("\n"))   
     } else {
       alert(data.error || "Errore durante la registrazione");

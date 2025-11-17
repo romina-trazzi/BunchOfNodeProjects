@@ -1,7 +1,7 @@
 console.log("Chat evento caricata ✔️");
 
 // ===============================
-// 1️⃣  Recupero ID evento da URL
+// Recupero ID evento da URL
 // ===============================
 const params = new URLSearchParams(window.location.search);
 const eventId = params.get("id");
@@ -12,14 +12,14 @@ if (!eventId) {
 }
 
 // ===============================
-// 2️⃣  Variabili DOM
+// Variabili DOM
 // ===============================
 const chatBox = document.getElementById("chatMessages");
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendMessageButton");
 
 // ===============================
-// 3️⃣  Recupero token e dati utente
+// Recupero token e dati utente
 // ===============================
 const token = localStorage.getItem("accessToken");
 const username = localStorage.getItem("username");
@@ -30,7 +30,7 @@ if (!token) {
 }
 
 // ==============================================
-// 4️⃣  Funzione helper per chiamate API con token
+// Funzione helper per chiamate API con token
 // ==============================================
 async function tokenFetch(url, options = {}) {
   const opts = {
@@ -47,7 +47,7 @@ async function tokenFetch(url, options = {}) {
 }
 
 // ===============================
-// 5️⃣  Caricamento messaggi iniziali
+// Caricamento messaggi iniziali
 // ===============================
 async function loadMessages() {
   const messages = await tokenFetch(`/api/events/${eventId}/messages`);
@@ -62,7 +62,7 @@ async function loadMessages() {
 }
 
 // =============================================================
-// 6️⃣  Funzione UI: aggiungi messaggio alla chat
+// Funzione aggiungi messaggio alla chat
 // =============================================================
 function addMessageToUI(sender, text, timestamp) {
   const div = document.createElement("div");
@@ -86,14 +86,14 @@ function addMessageToUI(sender, text, timestamp) {
 }
 
 // ===============================
-// 7️⃣  Scroll automatico in fondo
+// Scroll automatico in fondo
 // ===============================
 function scrollToBottom() {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 // ===============================
-// 8️⃣  Socket.io: connessione e join room
+// Socket.io: connessione e join chatroom
 // ===============================
 const socket = io();
 
@@ -105,7 +105,7 @@ socket.on("new-message", data => {
 });
 
 // =============================================================
-// 9️⃣  Invio messaggio (API POST + Socket emit)
+// Invio messaggio (API POST + Socket emit)
 // =============================================================
 async function sendMessage() {
   const text = messageInput.value.trim();
@@ -134,7 +134,7 @@ async function sendMessage() {
 
 
 // ============================================
-// 🔟 Event listeners per invio messaggio
+// Event listeners per invio messaggio
 // ============================================
 sendButton.addEventListener("click", sendMessage);
 
@@ -143,6 +143,6 @@ messageInput.addEventListener("keypress", e => {
 });
 
 // ===============================
-// 1️⃣1️⃣ Carica messaggi iniziali
+// Carica messaggi iniziali
 // ===============================
 loadMessages();
