@@ -407,10 +407,19 @@ document.addEventListener("DOMContentLoaded", () => {
       badge.textContent = "Iscritto";
 
       const btnGroup = document.createElement("div");
-      btnGroup.classList.add("d-flex", "justify-content-between", "mt-auto");
+      btnGroup.classList.add("d-flex", "justify-content-between", "mt-auto", "gap-2");
+
+      const chatBtn = document.createElement("button");
+      chatBtn.classList.add("btn", "btn-primary", "btn-sm", "flex-fill");
+      chatBtn.textContent = "Chat";
+
+      chatBtn.addEventListener("click", () => {
+        window.location.href = `./event_chat.html?id=${evt.id}`;
+      });
+
 
       const unsubBtn = document.createElement("button");
-      unsubBtn.classList.add("btn", "btn-danger", "btn-sm");
+      unsubBtn.classList.add("btn", "btn-danger", "btn-sm", "flex-fill");
       unsubBtn.textContent = "Disiscriviti";
 
       unsubBtn.addEventListener("click", async () => {
@@ -418,7 +427,9 @@ document.addEventListener("DOMContentLoaded", () => {
         loadMySubscribedEvents();
       });
 
-      btnGroup.append(unsubBtn);
+    
+      btnGroup.append(chatBtn, unsubBtn);
+
 
       body.append(badge, title, date, loc, cat, desc, btnGroup);
       card.appendChild(body);

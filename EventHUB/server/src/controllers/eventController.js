@@ -364,3 +364,92 @@ exports.sendMessageToEvent = async (req, res) => {
     res.status(500).json({ error: "Errore invio messaggio" });
   }
 };
+
+/* ============================================================
+   CHAT: OTTIENI TUTTI I MESSAGGI DI UN EVENTO
+============================================================ */
+exports.getEventMessages = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const userId  = req.user.id;
+
+    // Controllo iscrizione → obbligatorio
+    const isMember = await Registration.findOne({
+      where: { userId, eventId }
+    });
+
+    if (!isMember) {
+      return res.status(403).json({ error: "Non sei iscritto a questo evento" });
+    }
+
+    const messages = await Message.findAll({
+      where: { eventId },
+      include: [
+        { model: User, attributes: ["username"] }
+      ],
+      order: [["createdAt", "ASC"]]
+    });
+
+    res.json(messages);
+
+  } catch (err) {
+    console.error("Errore getEventMessages:", err);
+    res.status(500).json({ error: "Errore nel recupero dei messaggi" });
+  }
+};
+
+
+
+/* ============================================================
+   CHAT: INVIA MESSAGGIO IN UN EVENTO (SALVATAGGIO + SOCKET)
+============================================================ */
+exports.sendMessageToEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const userId  = req.user.id;
+    const { message } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: "Messaggio vuoto" });
+    }
+
+    // Controllo iscrizione
+    const isMember = await Registration.findOne({
+      where: { userId, eventId }
+    });
+
+    if (!isMember) {
+      return res.status(403).json({ error: "Non sei iscritto a questo evento" });
+    }
+
+    // Salvataggio DB
+    const saved = await Message.create({
+      eventId,
+      userId,
+      body: message
+    });
+
+    const io = req.app.get("io");
+
+    // Recupero username per spedire un evento più ricco
+    const user = await User.findByPk(userId);
+
+    // Socket.io → invia a tutti nella stanza
+    io.to(eventId).emit("new-message", {
+      eventId,
+      userId,
+      username: user.username,
+      message,
+      createdAt: saved.createdAt
+    });
+
+    res.json({
+      message: "Messaggio inviato",
+      saved
+    });
+
+  } catch (err) {
+    console.error("Errore sendMessageToEvent:", err);
+    res.status(500).json({ error: "Errore invio messaggio" });
+  }
+};

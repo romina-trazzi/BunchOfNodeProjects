@@ -10,7 +10,7 @@ const cors = require('cors');
 const { sequelize, connectWithRetry } = require('./config/db_connection');
 
 // Import routes
-const authRoutes = require("./routes/authRoutes"); 
+const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
@@ -22,6 +22,9 @@ const server = http.createServer(app);
 
 // Inizializza Socket.io
 const io = socketIo(server);
+
+// Impostiamo io in app per renderlo accessibile nei controller
+app.set("io", io);
 
 // Configurazione di Socket.io
 io.on('connection', (socket) => {
@@ -39,7 +42,7 @@ io.on('connection', (socket) => {
     socket.to(data.eventId).emit('new-message', data);
   });
 
-  //  Notifica live: iscrizione
+  // Notifica live: iscrizione
   socket.on('new-registration', (data) => {
     socket.to(data.eventId).emit('new-registration', data);
   });
@@ -76,9 +79,6 @@ app.use(
           "https://cdnjs.cloudflare.com"
         ],
 
-        // IMPORTANTE: niente "script-src-attr"
-        // Bootstrap non funziona con script-src-attr attivo.
-
         "style-src": [
           "'self'",
           "https://cdn.jsdelivr.net",
@@ -109,14 +109,14 @@ app.use(
   })
 );
 
-
+// Altre configurazioni di Express
 app.use(express.json());
 
 // Serve static assets (CSS, JS, images, etc.)
 const publicDir = path.join(__dirname, '..', '..', 'client');
 app.use(express.static(publicDir));
 
-// Serve index.html for the root route
+// Serve index.html per la root route
 app.get('/', (_req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));
 });
@@ -136,7 +136,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Server start sequence
+// Avvio del server
 (async () => {
   try {
     await connectWithRetry();
@@ -149,42 +149,6 @@ app.use("/api/admin", adminRoutes);
     console.error('❌ Failed to start server:', err.message);
     process.exit(1);
   }
-
-  app.use(
-  helmet({
-    contentSecurityPolicy: {
-      useDefaults: true,
-      directives: {
-        "default-src": ["'self'"],
-        "script-src": [
-          "'self'"
-        ],
-        "script-src-elem": [
-          "'self'",
-          "https://cdn.jsdelivr.net",
-          "https://cdnjs.cloudflare.com"
-        ],
-        "style-src": [
-          "'self'",
-          "https://cdn.jsdelivr.net",
-          "https://fonts.googleapis.com"
-        ],
-        "font-src": [
-          "'self'",
-          "https://fonts.gstatic.com",
-          "https://cdn.jsdelivr.net"
-        ],
-        "img-src": [
-          "'self'",
-          "data:",
-          "https://cdn.jsdelivr.net"
-        ]
-      }
-    },
-    crossOriginEmbedderPolicy: false
-  })
-  );
-
 })();
 
 module.exports = app;

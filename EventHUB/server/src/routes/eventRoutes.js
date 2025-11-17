@@ -18,4 +18,13 @@ router.get("/subscribed", authenticateToken, eventController.getSubscribedEvents
 router.post("/:id/subscribe", authenticateToken, eventController.subscribeToEvent);
 router.delete("/:id/unsubscribe", authenticateToken, eventController.unsubscribeFromEvent);
 
+// Messaggi chat
+// CHAT: ottieni messaggi dell'evento
+router.get("/:id/messages", authenticateToken, eventController.getEventMessages);
+
+// CHAT: invia un messaggio
+router.post("/:id/messages", authenticateToken, eventController.sendMessageToEvent);
+
+
+
 module.exports = router;
