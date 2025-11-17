@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 'USER',
     },
+    isBlocked: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   });
 
   // Associations between User and other models

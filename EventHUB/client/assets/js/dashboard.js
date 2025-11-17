@@ -20,9 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("usernameDisplay").textContent = username || "Utente";
   document.getElementById("welcomeUser").textContent     = username || "Utente";
 
-  if (role === "ADMIN") {
-    document.getElementById("adminSection").classList.remove("d-none");
-  }
 
   // Notifiche simulate
   const notifBadge = document.getElementById("notifBadge");
@@ -30,6 +27,26 @@ document.addEventListener("DOMContentLoaded", () => {
     notifBadge.textContent = Math.floor(Math.random() * 5);
     notifBadge.classList.add("pulse");
   }, 2000);
+
+  // =========================================================================
+  // MOSTRA CARD ADMIN SOLO SE L'UTENTE È ADMIN
+  // =========================================================================
+
+  if (role === "ADMIN") {
+      const adminSection = document.getElementById("adminSection");
+      if (adminSection) {
+        adminSection.classList.remove("d-none");
+      }
+    }
+
+  if (role === "ADMIN") {
+    const pendingCard = document.getElementById("adminPendingEventsCard");
+    const usersCard = document.getElementById("adminUserManagementCard");
+
+    if (pendingCard) pendingCard.classList.remove("d-none");
+    if (usersCard) usersCard.classList.remove("d-none");
+  }
+
 
 
   // ============================================================

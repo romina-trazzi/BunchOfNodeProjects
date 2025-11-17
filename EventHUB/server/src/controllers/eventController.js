@@ -8,7 +8,11 @@ const { Op } = db.Sequelize;
 // ============================================================
 exports.createEvent = async (req, res) => {
   try {
+    // ID dell'utente preso dal token JWT
     const userId = req.user.id;
+
+    // Se admin → evento approvato immediatamente
+    const status = req.user.role === "ADMIN" ? "APPROVED" : "PENDING";
 
     const {
       title,
@@ -17,9 +21,10 @@ exports.createEvent = async (req, res) => {
       capacity,
       category,
       location,
-      imageUrl
+      imageUrl,
     } = req.body;
 
+    // Creazione evento
     const event = await Event.create({
       ownerId: userId,
       title,
@@ -28,13 +33,14 @@ exports.createEvent = async (req, res) => {
       capacity,
       category,
       location,
-      imageUrl
+      imageUrl,
+      status   // <<< AGGIUNTO QUI
     });
 
-    // 🔹 L'organizzatore viene automaticamente iscritto come partecipante
+    // Organizzatore iscritto automaticamente
     await Registration.create({
       userId: userId,
-      eventId: event.id
+      eventId: event.id,
     });
 
     return res.status(201).json({
@@ -43,7 +49,7 @@ exports.createEvent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Errore createEvent:", error);
     res.status(500).json({ error: "Errore durante la creazione dell’evento" });
   }
 };
@@ -144,6 +150,8 @@ exports.getAllEvents = async (req, res) => {
     const { title, month, category, location } = req.query;
 
     const where = {};
+
+    where.status = "APPROVED";
 
     if (title) where.title = { [Op.iLike]: `%${title}%` };
 
@@ -246,5 +254,63 @@ exports.unsubscribeFromEvent = async (req, res) => {
   } catch (err) {
     console.error("Errore unsubscribe:", err);
     res.status(500).json({ error: "Errore del server" });
+  }
+};
+
+// ============================================================
+// ADMIN AREA
+// ============================================================
+
+// Approva evento
+exports.approveEvent = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const event = await Event.findByPk(id);
+
+    if (!event) {
+      return res.status(404).json({ error: "Evento non trovato" });
+    }
+
+    event.status = "APPROVED";
+    await event.save();
+
+    res.json({ message: "Evento approvato con successo", event });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Rifiuta evento
+exports.rejectEvent = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const event = await Event.findByPk(id);
+
+    if (!event) {
+      return res.status(404).json({ error: "Evento non trovato" });
+    }
+
+    event.status = "REJECTED";
+    await event.save();
+
+    res.json({ message: "Evento rifiutato", event });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Lista eventi PENDING 
+exports.getPendingEvents = async (req, res) => {
+  try {
+    const events = await Event.findAll({
+      where: { status: "PENDING" },
+      order: [["createdAt", "ASC"]]
+    });
+
+    res.json(events);
+
+  } catch (err) {
+    console.error("Errore getPendingEvents:", err);
+    res.status(500).json({ error: "Errore nel recupero degli eventi in attesa" });
   }
 };

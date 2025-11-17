@@ -8,11 +8,14 @@
 
 */
 
+console.log("AUTH MIDDLEWARE CARICATO");
+
 // Import jwt for verifying the token
 const jwt = require("jsonwebtoken");
 
 // Middleware to protect routes
 function authenticateToken(req, res, next) {
+  console.log("AUTH MIDDLEWARE CHIAMATO");
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 

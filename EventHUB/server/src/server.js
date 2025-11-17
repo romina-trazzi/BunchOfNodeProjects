@@ -24,6 +24,7 @@ const db = require('./models');
 // Import routes
 const authRoutes = require("./routes/authRoutes"); 
 const eventRoutes = require("./routes/eventRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 
 const app = express();
@@ -104,8 +105,9 @@ app.get('/health', async (_req, res) => {
 /* ---------------------------
  * API routes
  * --------------------------- */
-app.use('/api/auth', authRoutes);
 app.use('/api/events', require('./routes/eventRoutes'));
+app.use('/api/auth', authRoutes);
+app.use("/api/admin", adminRoutes);
 
 /* ---------------------------
  * Server start sequence
