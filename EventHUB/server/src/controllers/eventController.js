@@ -58,3 +58,83 @@ exports.getMyEvents = async (req, res) => {
     res.status(500).json({ error: "Errore durante il recupero degli eventi" });
   }
 };
+
+
+// Funzione per eliminare un evento creato da un utente
+exports.deleteEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const userId = req.user.id; // preso dal token
+
+    const event = await Event.findByPk(eventId);
+
+    if (!event) {
+      return res.status(404).json({ error: 'Evento non trovato' });
+    }
+
+    // Solo il proprietario può eliminarlo
+    if (event.ownerId !== userId) {
+      return res.status(403).json({ error: 'Non autorizzato a eliminare questo evento' });
+    }
+
+    await event.destroy();
+
+    return res.json({ message: 'Evento eliminato con successo' });
+
+  } catch (error) {
+    console.error('Errore eliminazione evento:', error);
+    return res.status(500).json({ error: 'Errore del server' });
+  }
+};
+
+
+// Funzione per aggiornare un evento  
+exports.updateEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const userId = req.user.id;
+
+    // Cerca l'evento
+    const event = await Event.findByPk(eventId);
+
+    if (!event) {
+      return res.status(404).json({ error: "Evento non trovato" });
+    }
+
+    // Sicurezza: solo il proprietario può modificare
+    if (event.ownerId !== userId) {
+      return res.status(403).json({ error: "Non autorizzato a modificare questo evento" });
+    }
+
+    // Dati aggiornabili
+    const {
+      title,
+      description,
+      startsAt,
+      capacity,
+      category,
+      location,
+      imageUrl
+    } = req.body;
+
+    // Aggiornamento
+    await event.update({
+      title: title ?? event.title,
+      description: description ?? event.description,
+      startsAt: startsAt ?? event.startsAt,
+      capacity: capacity ?? event.capacity,
+      category: category ?? event.category,
+      location: location ?? event.location,
+      imageUrl: imageUrl ?? event.imageUrl
+    });
+
+    return res.json({
+      message: "Evento aggiornato con successo",
+      event
+    });
+
+  } catch (error) {
+    console.error("Errore update evento:", error);
+    return res.status(500).json({ error: "Errore del server" });
+  }
+};

@@ -5,7 +5,7 @@ console.log("Dashboard loaded ✅");
 document.addEventListener("DOMContentLoaded", () => {
 
   // ============================================================
-  // 1. RECUPERO DATI UTENTE E VALIDAZIONE ACCESSO
+  // RECUPERO DATI UTENTE E VALIDAZIONE ACCESSO
   // ============================================================
 
   const username    = localStorage.getItem("username");
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const accessToken = localStorage.getItem("accessToken");
 
   if (!accessToken) {
-    window.location.href = "/pages/login.html";
+    window.location.href = "../../index.html";
     return;
   }
 
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // ============================================================
-  // 2. GESTIONE APERTURA / CHIUSURA FORM CREAZIONE EVENTO
+  // GESTIONE APERTURA / CHIUSURA FORM CREAZIONE EVENTO
   // ============================================================
 
   const openCreateBtn = document.getElementById("openCreateEventBtn");
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // ============================================================
-  // 3. SUBMIT FORM CREAZIONE EVENTO
+  // SUBMIT FORM CREAZIONE EVENTO
   // ============================================================ 
 
   if (eventForm) {
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================================
-  // 4. FUNZIONE CARICA EVENTI CREATI (senza HTML nel JS)
+  // FUNZIONE CARICA EVENTI CREATI (senza HTML nel JS)
   // ============================================================
 
   async function loadMyEvents() {
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // body
       const body = document.createElement("div");
-      body.classList.add("card-body", "event-card-body", "d-flex", "flex-column", "justify-content-between");
+      body.classList.add("spacer");
 
       // titolo
       const title = document.createElement("h5");
@@ -175,9 +175,12 @@ document.addEventListener("DOMContentLoaded", () => {
       editBtn.classList.add("btn", "btn-warning", "btn-sm");
       editBtn.textContent = "Modifica";
 
+      editBtn.addEventListener("click", () => showEditModal(evt));
+
       const delBtn = document.createElement("button");
       delBtn.classList.add("btn", "btn-danger", "btn-sm");
       delBtn.textContent = "Elimina";
+      delBtn.addEventListener("click", () => showDeleteModal(evt.id));
 
       btnGroup.append(editBtn, delBtn);
 
@@ -190,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================================
-  // 5. GESTISCI VISIBILITÀ SEZIONE MIEI EVENTI
+  // GESTISCI VISIBILITÀ SEZIONE MIEI EVENTI
   // ============================================================
 
   const showMyEventsBtn  = document.getElementById("showMyEventsBtn");
@@ -199,6 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (showMyEventsBtn) {
     showMyEventsBtn.addEventListener("click", async () => {
+      cardsRow.classList.remove("creating");
+      createSection.classList.add("d-none");
       cardsRow.classList.add("d-none");          // nasconde le 3 card
       myEventsSection.classList.remove("d-none"); // mostra sezione eventi
       await loadMyEvents();                       // carica i dati
@@ -214,11 +219,112 @@ document.addEventListener("DOMContentLoaded", () => {
     
 
 
+  // ============================================================
+  // MOSTRA MODALE DI ELIMINAZIONE
+  // ============================================================
+  let eventIdToDelete = null;
 
+  function showDeleteModal(eventId) {
+    eventIdToDelete = eventId;
+    const modal = new bootstrap.Modal(document.getElementById("deleteConfirmModal"));
+    modal.show();
+  }
 
+  document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
+    if (eventIdToDelete) {
+      deleteEvent(eventIdToDelete);
+      eventIdToDelete = null;
+    }
 
+    const modalEl = document.getElementById("deleteConfirmModal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
+  });
 
+  // ============================================================
+  // MODIFICA EVENTO - VARIABILI E FUNZIONI MODALE
+  // ============================================================
 
+  let eventIdToEdit = null;
+
+  function showEditModal(event) {
+    eventIdToEdit = event.id;
+
+    // Precompila i campi della modale
+    document.getElementById("editTitle").value       = event.title;
+    document.getElementById("editDescription").value = event.description || "";
+    document.getElementById("editDate").value        = event.startsAt.split("T")[0];
+    document.getElementById("editCapacity").value    = event.capacity;
+    document.getElementById("editCategory").value    = event.category || "";
+    document.getElementById("editLocation").value    = event.location || "";
+    document.getElementById("editImageUrl").value    = event.imageUrl || "";
+
+    // Apri la modale
+    const modal = new bootstrap.Modal(document.getElementById("editEventModal"));
+    modal.show();
+  }
+
+  async function saveEditedEvent() {
+    if (!eventIdToEdit) return;
+
+    const updatedEvent = {
+      title:       document.getElementById("editTitle").value.trim(),
+      description: document.getElementById("editDescription").value.trim(),
+      startsAt:    document.getElementById("editDate").value,
+      capacity:    parseInt(document.getElementById("editCapacity").value),
+      category:    document.getElementById("editCategory").value.trim(),
+      location:    document.getElementById("editLocation").value.trim(),
+      imageUrl:    document.getElementById("editImageUrl").value.trim()
+    };
+
+    try {
+      const result = await tokenFetch(`/api/events/${eventIdToEdit}`, {
+        method: "PUT",
+        body: JSON.stringify(updatedEvent),
+      });
+
+      if (result.error) {
+        alert(result.error);
+        return;
+      }
+
+      // Chiudi la modale
+      const modalEl = document.getElementById("editEventModal");
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+
+      // Aggiorna lista eventi
+      loadMyEvents();
+
+    } catch (err) {
+      console.error("Errore update evento:", err);
+      alert("Errore del server");
+    }
+  }
+
+  // Pulsante SALVA nella modale
+  document.getElementById("saveEditBtn").addEventListener("click", saveEditedEvent)
+
+  // ============================================================
+  // ELIMINA EVENTO CREATO DA UN UTENTE
+  // ============================================================
+  async function deleteEvent(eventId) {
+    try {
+      const result = await tokenFetch(`/api/events/${eventId}`, {
+        method: 'DELETE'
+      });
+
+      if (result.error) {
+        alert(result.error);
+        return;
+      }
+      loadMyEvents();
+
+    } catch (err) {
+      console.error("Errore durante la richiesta DELETE:", err);
+      alert("Errore del server");
+    }
+  }
 
 
 
@@ -226,7 +332,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // ============================================================
-  // 4. LOGOUT (desktop + mobile)
+  // LOGOUT (desktop + mobile)
   // ============================================================
 
   const logout = () => {
@@ -239,7 +345,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("logoutBtn")?.addEventListener("click", logout);
   document.getElementById("logoutBtnMobile")?.addEventListener("click", logout);
-
-
-
 });

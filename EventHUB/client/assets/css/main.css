@@ -408,6 +408,15 @@
   align-self: center;
 }
 
+.dashboard-card .card-text {
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 3rem;
+}
+
 /* Sezione Admin */
 #adminSection {
   animation: fadeIn 0.8s ease forwards;
@@ -449,6 +458,9 @@
   justify-content: center;
 }
 .dashboard-container .row.creating > *:not(#createEventSection) {
+  display: none !important;
+}
+#mainCardsRow.hidden {
   display: none !important;
 }
 #createEventSection .card {
@@ -561,8 +573,22 @@
    CARD EVENTI CREATI DALL'UTENTE
 ============================================ */
 
+.event-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.event-card .spacer {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+.event-card-buttons {
+  margin-top: auto;
+}
+
 .card-description {
-  max-height: 3.5rem;         
+  max-height: 3.5rem;       
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -570,3 +596,21 @@
   -webkit-line-clamp: 3;          /* numero di righe */
   -webkit-box-orient: vertical;
 }
+
+.spacer {
+  padding: 2rem;
+}
+
+
+
+/* Modale */
+
+.modal-content {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.modal-header, .modal-body, .modal-footer {
+  color: #000000 !important;
+}
+
