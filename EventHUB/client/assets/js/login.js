@@ -39,6 +39,7 @@ form.addEventListener("submit", async (e) => {
       localStorage.setItem("refreshToken", data.tokens.refreshToken);
       localStorage.setItem("username", data.user.username);
       localStorage.setItem("userRole", data.user.role);
+      localStorage.setItem("userId", data.user.id);
 
       alert(`Bentornato, ${data.user.username}! 🎉`);
       // ✅ Redirect to dashboard
