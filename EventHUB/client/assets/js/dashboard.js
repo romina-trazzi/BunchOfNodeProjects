@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showMyEventsBtn.addEventListener("click", async () => {
       cardsRow.classList.remove("creating");
       createSection.classList.add("d-none");
-      cardsRow.classList.add("d-none");          // nasconde le 3 card
+      cardsRow.classList.add("d-none");          // nasconde le card
       myEventsSection.classList.remove("d-none"); // mostra sezione eventi
       await loadMyEvents();                       // carica i dati
     });
@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (closeMyEventsBtn) {
     closeMyEventsBtn.addEventListener("click", () => {
       myEventsSection.classList.add("d-none");     // nasconde sezione
-      cardsRow.classList.remove("d-none");         // mostra le 3 card
+      cardsRow.classList.remove("d-none");         // mostra le card
     });
   }
     

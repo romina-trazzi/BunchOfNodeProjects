@@ -314,7 +314,7 @@ exports.getPendingEvents = async (req, res) => {
       include: [
         {
           model: User,
-          as: "User", // <- importante per ev.User.username
+          as: "User", 
           attributes: ["username", "email"]
         }
       ],
@@ -333,73 +333,6 @@ exports.getPendingEvents = async (req, res) => {
 
 /* ============================================================
    CHAT: INVIA MESSAGGIO NELL'EVENTO
-============================================================ */
-exports.sendMessageToEvent = async (req, res) => {
-  try {
-    const eventId = req.params.id;
-    const userId = req.user.id;
-    const { message } = req.body;
-
-    const io = req.app.get("io");
-
-    const saved = await Message.create({
-      eventId,
-      userId,
-      message
-    });
-
-    io.to(eventId).emit("new-message", {
-      eventId,
-      userId,
-      message,
-      createdAt: saved.createdAt
-    });
-
-    res.json({ message: "Messaggio inviato", saved });
-
-  } catch (err) {
-    console.error("Errore sendMessage:", err);
-    res.status(500).json({ error: "Errore invio messaggio" });
-  }
-};
-
-/* ============================================================
-   CHAT: OTTIENI TUTTI I MESSAGGI DI UN EVENTO
-============================================================ */
-exports.getEventMessages = async (req, res) => {
-  try {
-    const eventId = req.params.id;
-    const userId  = req.user.id;
-
-    // Controllo iscrizione → obbligatorio
-    const isMember = await Registration.findOne({
-      where: { userId, eventId }
-    });
-
-    if (!isMember) {
-      return res.status(403).json({ error: "Non sei iscritto a questo evento" });
-    }
-
-    const messages = await Message.findAll({
-      where: { eventId },
-      include: [
-        { model: User, attributes: ["username"] }
-      ],
-      order: [["createdAt", "ASC"]]
-    });
-
-    res.json(messages);
-
-  } catch (err) {
-    console.error("Errore getEventMessages:", err);
-    res.status(500).json({ error: "Errore nel recupero dei messaggi" });
-  }
-};
-
-
-
-/* ============================================================
-   CHAT: INVIA MESSAGGIO IN UN EVENTO (SALVATAGGIO + SOCKET)
 ============================================================ */
 exports.sendMessageToEvent = async (req, res) => {
   try {
@@ -451,3 +384,40 @@ exports.sendMessageToEvent = async (req, res) => {
     res.status(500).json({ error: "Errore invio messaggio" });
   }
 };
+
+
+/* ============================================================
+   CHAT: OTTIENI TUTTI I MESSAGGI DI UN EVENTO
+============================================================ */
+exports.getEventMessages = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const userId  = req.user.id;
+
+    // Controllo iscrizione → obbligatorio
+    const isMember = await Registration.findOne({
+      where: { userId, eventId }
+    });
+
+    if (!isMember) {
+      return res.status(403).json({ error: "Non sei iscritto a questo evento" });
+    }
+
+    const messages = await Message.findAll({
+      where: { eventId },
+      include: [
+        { model: User, attributes: ["username"] }
+      ],
+      order: [["createdAt", "ASC"]]
+    });
+
+    res.json(messages);
+
+  } catch (err) {
+    console.error("Errore getEventMessages:", err);
+    res.status(500).json({ error: "Errore nel recupero dei messaggi" });
+  }
+};
+
+
+

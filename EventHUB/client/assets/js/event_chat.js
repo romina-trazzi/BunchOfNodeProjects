@@ -6,6 +6,10 @@ console.log("Chat evento caricata ✔️");
 const params = new URLSearchParams(window.location.search);
 const eventId = params.get("id");
 
+// Tornare indietro (Link torna all'evento)
+const backLink = document.getElementById("backToEvent");
+backLink.setAttribute("href", `dashboard.html`);
+
 if (!eventId) {
   alert("Errore: ID evento mancante nell’URL.");
   throw new Error("Event ID missing");
@@ -55,9 +59,12 @@ async function loadMessages() {
   chatBox.innerHTML = "";
 
   messages.forEach(msg => {
+  if (msg.user && msg.user.username) {
     addMessageToUI(msg.user.username, msg.body, msg.createdAt);
-  });
-
+  } else {
+    console.error("Messaggio senza utente valido:", msg);
+  }
+});
   scrollToBottom();
 }
 
@@ -99,7 +106,12 @@ const socket = io();
 
 socket.emit("join-event", eventId);
 
-socket.on("new-message", data => {
+socket.on("new-message", (data) => {
+  const myId = localStorage.getItem("userId");
+
+  // Se il messaggio è stato inviato da me → NON aggiungerlo di nuovo
+  if (data.userId === myId) return;
+
   addMessageToUI(data.username, data.message, data.createdAt);
   scrollToBottom();
 });
@@ -112,7 +124,7 @@ async function sendMessage() {
 
   if (!text) return;
 
-  // Invia il messaggio al server (senza mostrarlo due volte)
+  // Invia il messaggio al server 
   const res = await tokenFetch(`/api/events/${eventId}/messages`, {
     method: "POST",
     body: JSON.stringify({ message: text })
@@ -124,8 +136,7 @@ async function sendMessage() {
     return;
   }
 
-  // Solo quando il messaggio è stato inviato e salvato dal server, lo mostriamo
-  // Lo mostriamo subito nella chat dell’utente
+  // Solo quando il messaggio è stato inviato lo mostriamo nella chat dell’utente
   addMessageToUI(username, text, new Date().toISOString());
   scrollToBottom();
 
