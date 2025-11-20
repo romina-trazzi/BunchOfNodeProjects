@@ -1,0 +1,62 @@
+/* Impostazioni generali per la tabella degli utenti */
+#userList {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#userList th, #userList td {
+  padding: 12px 15px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+#userList th {
+  background-color: #343a40; /* Colore scuro per l'intestazione */
+  color: white;
+  font-weight: bold;
+}
+
+#userList td {
+  background-color: #f8f9fa;
+}
+
+/* Stile per le righe alternate */
+#userList tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Colori per lo stato degli utenti */
+#userList .btn-danger {
+  background-color: #dc3545;  /* Rosso per il pulsante "Blocca" */
+  color: white;
+}
+
+#userList .btn-danger:hover {
+  background-color: #c82333;  /* Hover per il pulsante "Blocca" */
+}
+
+#userList .btn-success {
+  background-color: #28a745;  /* Verde per il pulsante "Sblocca" */
+  color: white;
+}
+
+#userList .btn-success:hover {
+  background-color: #218838;  /* Hover per il pulsante "Sblocca" */
+}
+
+/* Disabilita i pulsanti per gli utenti con ruolo "Admin" */
+#userList .btn:disabled {
+  background-color: #6c757d;
+  color: white;
+  cursor: not-allowed;
+}
+
+/* Aggiungi un po' di padding alla tabella e centraggio */
+.table-container {
+  margin: 0 auto;
+  width: 80%;
+  padding: 20px;
+}
+
+

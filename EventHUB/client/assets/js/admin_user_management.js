@@ -1,81 +1,79 @@
+import { tokenFetch } from "./helpers/tokenFetch.js";
+
 console.log("Admin user management loaded");
 
-const token = localStorage.getItem("accessToken");
-const container = document.getElementById("usersList");
+document.addEventListener("DOMContentLoaded", function() {
+  loadUsers();
+});
 
+// Funzione per caricare gli utenti
 async function loadUsers() {
-  const res = await fetch("/api/admin/users", {
-    headers: { Authorization: "Bearer " + token },
-  });
-  const users = await res.json();
+  try {
+    const users = await tokenFetch('/api/admin/users?' + new Date().getTime());  // Recupera gli utenti tramite API
 
-  container.innerHTML = "";
+    const userList = document.getElementById('usersList');
+    if (!userList) {
+      console.error('Elemento usersList non trovato!');
+      return;
+    }
 
-  if (!users || users.length === 0) {
-    container.innerHTML = `<p class="no-events">Nessun utente trovato.</p>`;
-    return;
+    userList.innerHTML = '';  // Pulisce la lista
+
+    // Mostra gli utenti nella UI
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      
+      const buttonClass = user.isBlocked ? 'btn-success' : 'btn-danger';
+      const buttonText = user.isBlocked ? 'Sblocca' : 'Blocca';
+
+      row.innerHTML = `
+        <td>${user.username}</td>
+        <td>${user.isBlocked ? 'Bloccato' : 'Attivo'}</td>
+        <td>
+          ${user.role === 'ADMIN' ? '' : `<button class="btn ${buttonClass}">
+            ${buttonText}
+          </button>`}
+        </td>
+      `;
+      
+      userList.appendChild(row);
+
+      // Aggiungi il gestore di eventi solo se non è un ADMIN
+      const button = row.querySelector('button');
+      if (button && user.role !== 'ADMIN') {
+        button.addEventListener('click', function() {
+          toggleBlock(user.id, user.isBlocked, button);
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Errore nel recupero degli utenti:", error);
+    alert("Si è verificato un errore nel recupero degli utenti.");
   }
-
-  users.forEach((u) => {
-    const col = document.createElement("div");
-    col.classList.add("col-md-4", "d-flex");
-
-    const card = document.createElement("div");
-    card.classList.add("card", "event-card", "shadow-sm", "flex-fill");
-
-    const body = document.createElement("div");
-    body.classList.add("event-card-body");
-
-    const title = document.createElement("h5");
-    title.classList.add("fw-bold");
-    title.textContent = u.username;
-
-    const email = document.createElement("p");
-    email.classList.add("text-muted", "mb-1");
-    email.textContent = u.email;
-
-    const role = document.createElement("span");
-    role.classList.add("badge", u.role === "ADMIN" ? "badge-organizer" : "badge-subscribed", "mb-2");
-    role.textContent = u.role;
-
-    const btns = document.createElement("div");
-    btns.classList.add("event-card-buttons", "d-flex", "justify-content-between", "mt-3");
-
-    const blockBtn = document.createElement("button");
-    blockBtn.classList.add("btn", "btn-outline-danger", "btn-sm", "d-flex", "align-items-center", "gap-2");
-    blockBtn.innerHTML = `<i class="bi bi-slash-circle"></i> Blocca`;
-
-    const unblockBtn = document.createElement("button");
-    unblockBtn.classList.add("btn", "btn-outline-success", "btn-sm", "d-flex", "align-items-center", "gap-2");
-    unblockBtn.innerHTML = `<i class="bi bi-check-circle"></i> Sblocca`;
-
-    // Disabilita azioni su ADMIN
-    if (u.role === "ADMIN") {
-      blockBtn.disabled = true;
-      unblockBtn.disabled = true;
-    }
-
-    // Stato iniziale
-    if (u.isBlocked) {
-      blockBtn.classList.add("active");
-    }
-
-    blockBtn.addEventListener("click", async () => {
-      await fetch(`/api/admin/users/${u.id}/block`, { method: "PUT", headers: { Authorization: "Bearer " + token } });
-      loadUsers();
-    });
-
-    unblockBtn.addEventListener("click", async () => {
-      await fetch(`/api/admin/users/${u.id}/unblock`, { method: "PUT", headers: { Authorization: "Bearer " + token } });
-      loadUsers();
-    });
-
-    btns.append(blockBtn, unblockBtn);
-    body.append(role, title, email, btns);
-    card.appendChild(body);
-    col.appendChild(card);
-    container.appendChild(col);
-  });
 }
 
-loadUsers();
+// Funzione per bloccare/sbloccare un utente
+async function toggleBlock(userId, isBlocked, button) {
+  try {
+    const endpoint = isBlocked ? 'unblock' : 'block';
+    const response = await tokenFetch(`/api/admin/users/${userId}/${endpoint}`, { method: 'PUT' });
+
+    const nowBlocked = response?.user?.isBlocked === true;
+    if (nowBlocked) {
+      alert('Utente bloccato con successo');
+      button.classList.remove('btn-danger');
+      button.classList.add('btn-success');
+      button.textContent = 'Sblocca';
+    } else {
+      alert('Utente sbloccato con successo');
+      button.classList.remove('btn-success');
+      button.classList.add('btn-danger');
+      button.textContent = 'Blocca';
+    }
+
+    loadUsers();
+  } catch (error) {
+    console.error("Errore nel bloccare/sbloccare l'utente:", error);
+    alert("Si è verificato un errore durante l'operazione.");
+  }
+}

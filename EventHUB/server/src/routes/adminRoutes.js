@@ -15,7 +15,6 @@ router.get("/test", authenticateToken, isAdmin, (req, res) => {
   });
 });
 
-
 // Approva un evento
 router.put("/events/:id/approve", authenticateToken, isAdmin, eventController.approveEvent);
 
@@ -29,6 +28,5 @@ router.get("/events/pending", authenticateToken, isAdmin, eventController.getPen
 router.get("/users", authenticateToken, isAdmin, adminUserController.listUsers);
 router.put("/users/:id/block", authenticateToken, isAdmin, adminUserController.blockUser);
 router.put("/users/:id/unblock", authenticateToken, isAdmin, adminUserController.unblockUser);
-
 
 module.exports = router;
